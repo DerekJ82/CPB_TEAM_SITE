@@ -1,0 +1,350 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #000; overflow: hidden; font-family: 'Press Start 2P', monospace; }
+#gameCanvas {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: block;
+  image-rendering: pixelated; image-rendering: crisp-edges;
+}
+
+/* RETRO HUD */
+#retro-hud {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  padding: 0 30px 20px; pointer-events: none; z-index: 500;
+  background: rgba(0,0,0,0.9); border-top: 4px solid #444;
+}
+#speedo-panel {
+  display: flex; align-items: flex-end; gap: 10px; flex-shrink: 0;
+}
+.speedo-svg-wrap { position: relative; width: 160px; height: 90px; overflow: visible; }
+.retro-lcd {
+  background: rgba(0,0,0,0.85); border: 2px solid #555; border-radius: 4px;
+  padding: 4px 10px; display: flex; flex-direction: column; align-items: center;
+  gap: 1px; min-width: 58px;
+}
+.lcd-label { font-size: 8px; letter-spacing: 2px; color: #777; text-transform: uppercase; }
+.lcd-value {
+  font-size: 18px; font-weight: 900; color: #fbcc04;
+  text-shadow: 0 0 6px rgba(251,204,4,0.7); line-height: 1;
+}
+.lcd-value.green { color: #39ff14; text-shadow: 0 0 6px rgba(57,255,20,0.6); }
+
+#milestone-panel {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 5px; flex-shrink: 0;
+}
+.ms-row {
+  background: rgba(0,0,0,0.85); border: 2px solid #444; border-radius: 4px;
+  padding: 4px 16px; display: flex; align-items: center; gap: 20px; min-width: 300px;
+  justify-content: space-between;
+}
+.ms-label { font-size: 11px; letter-spacing: 3px; color: #888; text-transform: uppercase; font-weight: 700; flex-shrink: 0; }
+.ms-value { font-size: 18px; font-weight: 900; text-align: right; white-space: nowrap; }
+.ms-value.gm    { color: #00d2ff; text-shadow: 0 0 6px rgba(0,210,255,0.5); }
+.ms-value.kddi  { color: #39ff14; text-shadow: 0 0 6px rgba(57,255,20,0.5); }
+.ms-value.total { color: #fbcc04; text-shadow: 0 0 6px rgba(251,204,4,0.5); }
+
+/* Top HUD bar */
+#top-hud {
+  position: fixed; top: 0; left: 0; right: 0; padding: 12px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+  pointer-events: none; z-index: 500;
+}
+.hud-controls {
+  display: flex; align-items: center; gap: 12px;
+  pointer-events: all;
+}
+#hud-target {
+  font-size: clamp(14px, 2vw, 20px); font-weight: 900; letter-spacing: 4px;
+  color: #fbcc04; text-shadow: 0 0 12px rgba(251,204,4,0.8), 2px 2px 0 #000;
+  text-transform: uppercase;
+}
+#hud-target.upgraded { color: #39ff14; text-shadow: 0 0 12px rgba(57,255,20,0.8), 2px 2px 0 #000; }
+
+/* Floating penalty text */
+#penalty-flash {
+  position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%);
+  font-size: 48px; font-weight: 900; color: #ff3333;
+  text-shadow: 3px 3px 0 #000, 0 0 20px rgba(255,51,51,0.8);
+  pointer-events: none; z-index: 600; opacity: 0;
+  transition: opacity 0.1s;
+}
+
+/* Ignition button (retro style) */
+#retro-ignition {
+  display: flex; align-items: center;
+}
+#ignitionBtn {
+  background: #1a1a1a; border: 3px solid #ff3333; border-radius: 50%;
+  width: 64px; height: 64px; cursor: pointer; font-size: 11px; font-weight: 900;
+  letter-spacing: 1px; color: #ff3333; text-transform: uppercase;
+  font-family: 'Courier New', monospace;
+  box-shadow: 0 0 15px rgba(255,51,51,0.4), inset 0 0 10px rgba(0,0,0,0.5);
+  transition: all 0.2s;
+}
+#ignitionBtn.on { border-color: #39ff14; color: #39ff14; box-shadow: 0 0 15px rgba(57,255,20,0.5), inset 0 0 10px rgba(57,255,20,0.1); }
+
+#honkGraphic {
+  position: fixed; top: 40%; left: 50%;
+  font-size: clamp(50px, 8vw, 110px); font-weight: 900; font-style: italic; color: #fbcc04;
+  text-shadow: 4px 4px 0 #cc0000, -4px -4px 0 #cc0000;
+  opacity: 0; pointer-events: none; z-index: 1000;
+  transform: translate(-50%, -50%) scale(0) rotate(-15deg);
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#honkGraphic.show { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-5deg); }
+
+/* HOW TO PLAY OVERLAY */
+#how-to-play {
+  position: fixed; inset: 0; background: rgba(5,6,8,0.92); z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(6px);
+}
+#how-to-play.hidden { display: none; }
+.htp-card {
+  background: linear-gradient(160deg, #141720 0%, #0a0c12 100%);
+  border: 2px solid #00d2ff; border-radius: 16px;
+  padding: clamp(24px, 4vw, 48px) clamp(28px, 5vw, 56px);
+  max-width: 560px; width: 90%; text-align: center;
+  box-shadow: 0 0 60px rgba(0,210,255,0.25), inset 0 0 40px rgba(0,0,0,0.6);
+}
+.htp-card h2 {
+  font-size: clamp(22px, 3.5vw, 36px); font-weight: 900; letter-spacing: 0.06em;
+  color: #00d2ff; text-transform: uppercase; margin: 0 0 6px;
+  text-shadow: 0 0 20px rgba(0,210,255,0.6);
+}
+.htp-card .htp-subtitle {
+  font-size: clamp(11px, 1.4vw, 14px); color: #6b7a94; margin: 0 0 28px; letter-spacing: 0.05em;
+}
+.htp-rules { list-style: none; padding: 0; margin: 0 0 28px; text-align: left; }
+.htp-rules li {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: clamp(12px, 1.5vw, 15px); color: #c8d0e0; padding: 9px 0;
+  border-bottom: 1px solid #1f232b;
+}
+.htp-rules li:last-child { border-bottom: none; }
+.htp-rules .icon { font-size: 1.4em; flex-shrink: 0; margin-top: 1px; }
+.htp-rules strong { color: #fbcc04; }
+.htp-start-btn {
+  background: linear-gradient(135deg, #00d2ff, #0077cc);
+  border: none; border-radius: 8px; color: #fff; cursor: pointer;
+  font-family: inherit; font-size: clamp(14px, 1.8vw, 17px); font-weight: 800;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 14px 40px; transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 20px rgba(0,210,255,0.4);
+}
+.htp-start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,210,255,0.5); }
+.htp-start-btn:active { transform: translateY(0); }
+
+/* ── TOUCH CONTROLS ────────────────────────────────────────────
+   Hidden by default; shown only on genuine touch screens.        */
+#touch-controls {
+  display: none;                /* hidden on mouse/desktop        */
+  position: fixed;
+  inset: 0;
+  pointer-events: none;         /* pass clicks through to canvas  */
+  z-index: 700;
+}
+
+/* Show on real touch screens only */
+@media (hover: none) and (pointer: coarse) {
+  #touch-controls { display: block; }
+}
+
+/* Clusters sit in the bottom corners */
+.tc-cluster {
+  position: absolute;
+  bottom: 130px;                /* sit above the HUD bar          */
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+.tc-cluster-left  { left: 18px; flex-direction: row; }
+.tc-cluster-right { right: 18px; flex-direction: column; }
+
+/* Base button style */
+.tc-btn {
+  pointer-events: all;          /* re-enable on buttons only      */
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.25);
+  background: rgba(0, 0, 0, 0.45);
+  color: #ffffff;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: filter 0.08s, transform 0.08s;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6), inset 0 0 8px rgba(255,255,255,0.05);
+}
+
+/* Colour accents */
+.tc-steer { color: #ffffff; }
+.tc-accel { color: #39ff14; border-color: rgba(57,255,20,0.4);
+            box-shadow: 0 0 14px rgba(57,255,20,0.25), inset 0 0 8px rgba(0,0,0,0.5); }
+.tc-brake { color: #ff3333; border-color: rgba(255,51,51,0.4);
+            box-shadow: 0 0 14px rgba(255,51,51,0.25), inset 0 0 8px rgba(0,0,0,0.5); }
+
+/* Pressed feedback */
+.tc-btn:active,
+.tc-btn.tc-pressed {
+  filter: brightness(1.6);
+  transform: scale(0.93);
+}
+
+/* ── LANDSCAPE MOBILE SCALING ──────────────────────────────────
+   On short landscape viewports (phones on their side) shrink the
+   HUD so the speedometer stays fully visible.                    */
+@media (orientation: landscape) and (max-height: 500px) {
+  #retro-hud {
+    padding: 0 10px 6px;
+  }
+  .speedo-svg-wrap {
+    width: 90px;
+    height: 55px;
+  }
+  #speedo-svg {
+    width: 90px;
+    height: 55px;
+  }
+  .retro-lcd {
+    padding: 2px 6px;
+    min-width: 44px;
+  }
+  .lcd-label { font-size: 6px; }
+  .lcd-value { font-size: 13px; }
+  .ms-row {
+    padding: 2px 8px;
+    min-width: 180px;
+    gap: 10px;
+  }
+  .ms-label { font-size: 8px; }
+  .ms-value { font-size: 13px; }
+  #speedo-panel { gap: 6px; }
+  #milestone-panel { gap: 3px; }
+
+  /* Keep touch buttons above the shrunken HUD */
+  .tc-cluster { bottom: 80px; }
+
+  /* Shrink top HUD */
+  #hud-target { font-size: 10px; letter-spacing: 2px; }
+  #top-hud { padding: 6px 10px; }
+
+  /* Ignition button */
+  #ignitionBtn { width: 48px; height: 48px; font-size: 9px; }
+}
+
+@keyframes canvasShake {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  15%  { transform: translate(-5px, 3px) rotate(-0.8deg); }
+  30%  { transform: translate(5px, -3px) rotate(0.8deg); }
+  45%  { transform: translate(-4px, 2px) rotate(-0.5deg); }
+  60%  { transform: translate(4px, -2px) rotate(0.5deg); }
+  75%  { transform: translate(-2px, 1px) rotate(-0.3deg); }
+  90%  { transform: translate(2px, -1px) rotate(0.2deg); }
+  100% { transform: translate(0,0) rotate(0deg); }
+}
+#gameCanvas.shake {
+  animation: canvasShake 0.45s ease-out forwards;
+}
+
+/* ── MUTE BUTTON ───────────────────────────────────────────── */
+#muteBtn {
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #00ccff;
+  color: #00ccff;
+  font-size: 1.2rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  line-height: 1;
+  pointer-events: all;
+}
+#muteBtn:hover { background: rgba(0,200,255,0.15); }
+
+/* ── PAUSE OVERLAY ─────────────────────────────────────────── */
+#pause-overlay {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.6);
+  z-index: 200;
+}
+#pause-overlay.hidden { display: none; }
+.pause-card {
+  background: #000;
+  border: 3px solid #00ccff;
+  border-radius: 12px;
+  padding: 40px 60px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,200,255,0.4);
+}
+.pause-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 2.5rem;
+  color: #fbcc04;
+  text-shadow: 0 0 16px #fbcc04;
+  letter-spacing: 0.15em;
+}
+.pause-hint {
+  margin-top: 16px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #00ccff;
+}
+
+/* ── VICTORY MODAL ─────────────────────────────────────────── */
+#victory-modal {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.75);
+  z-index: 300;
+}
+#victory-modal.hidden { display: none; }
+.vm-card {
+  background: #000;
+  border: 3px solid #fbcc04;
+  border-radius: 14px;
+  padding: 36px 52px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(251,204,4,0.5);
+  min-width: 320px;
+}
+.vm-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.6rem;
+  color: #fbcc04;
+  text-shadow: 0 0 20px #fbcc04;
+  margin-bottom: 28px;
+  letter-spacing: 0.1em;
+}
+.vm-stats { margin-bottom: 28px; }
+.vm-row {
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid #222;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+}
+.vm-label { color: #888; }
+.vm-val { color: #fff; }
+.vm-val.red { color: #ff4444; }
+.vm-val.gold { color: #fbcc04; }
+.vm-btn {
+  background: #fbcc04; color: #000;
+  border: none; border-radius: 8px;
+  padding: 14px 32px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.vm-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 20px rgba(251,204,4,0.6);
+}

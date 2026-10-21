@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>GM Connections Rally - Retro Arcade Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- HOW TO PLAY OVERLAY -->
+  <div id="how-to-play">
+    <div class="htp-card">
+      <h2>GM Connections Rally</h2>
+      <p class="htp-subtitle">A TELUS EPB Production &bull; October 2026</p>
+      <ul class="htp-rules">
+        <li>
+          <span class="icon">🚗</span>
+          <span>Hit the <strong>ignition</strong> to start. Watch GM and KDDI connections grow from 2024 to today.</span>
+        </li>
+        <li>
+          <span class="icon">⬅️➡️</span>
+          <span>Steer with <strong>Arrow Keys</strong> or <strong>A / D</strong>. Use <strong>Up / W</strong> to accelerate and <strong>Down / S</strong> to brake.</span>
+        </li>
+        <li>
+          <span class="icon">🐄</span>
+          <span>Hitting an animal costs <strong>15,000 connections</strong>. Stay alert!</span>
+        </li>
+        <li>
+          <span class="icon">🏁</span>
+          <span>Reach the end to see how many connections you protected. Can you finish with full points?</span>
+        </li>
+      </ul>
+      <button class="htp-start-btn" onclick="document.getElementById('how-to-play').classList.add('hidden')">Let's Drive!</button>
+    </div>
+  </div>
+
+  <!-- FULL SCREEN CANVAS -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- TOP HUD -->
+  <div id="top-hud">
+    <div id="hud-target">TARGET: 500,000</div>
+    <div class="hud-controls">
+      <button id="muteBtn" onclick="toggleMute()" title="Toggle Mute">🔊</button>
+      <div id="retro-ignition">
+        <button id="ignitionBtn" class="off" onclick="toggleIgnition()">START</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETRO HUD BOTTOM -->
+  <div id="retro-hud">
+    <div id="speedo-panel">
+      <!-- SVG Speedometer -->
+      <div class="speedo-svg-wrap">
+        <svg id="speedo-svg" viewBox="0 0 140 80" width="140" height="80">
+          <!-- Background arc -->
+          <path d="M10,75 A65,65 0 0,1 130,75" stroke="#333" stroke-width="10" fill="none"/>
+          <!-- Speed arc (animated) -->
+          <path id="speedo-arc" d="M10,75 A65,65 0 0,1 130,75" stroke="#fbcc04" stroke-width="10" fill="none"
+                stroke-dasharray="204" stroke-dashoffset="204"
+                style="transition: stroke-dashoffset 0.15s; filter: drop-shadow(0 0 4px #fbcc04);"/>
+          <!-- Needle -->
+          <line id="speedo-needle" x1="70" y1="72" x2="70" y2="20"
+                stroke="#ff3333" stroke-width="3" stroke-linecap="round"
+                style="transform-origin: 70px 72px; transform: rotate(-90deg); transition: transform 0.15s;"/>
+          <circle cx="70" cy="72" r="5" fill="#222" stroke="#555" stroke-width="1"/>
+          <text x="70" y="68" text-anchor="middle" fill="#888" font-size="9" font-family="Courier New">KM/H</text>
+        </svg>
+      </div>
+      <div class="retro-lcd">
+        <span class="lcd-label">Speed</span>
+        <span class="lcd-value" id="lcd-speed">0</span>
+      </div>
+      <div class="retro-lcd">
+        <span class="lcd-label">Gear</span>
+        <span class="lcd-value green" id="lcd-gear">N</span>
+      </div>
+      <div class="retro-lcd">
+        <span class="lcd-label">Time</span>
+        <span class="lcd-value" id="lcd-timer">00:00.0</span>
+      </div>
+    </div>
+
+    <div id="milestone-panel">
+      <div class="ms-row">
+        <span class="ms-label">GM</span>
+        <span class="ms-value gm" id="val-gm">0</span>
+      </div>
+      <div class="ms-row">
+        <span class="ms-label">KDDI</span>
+        <span class="ms-value kddi" id="val-kddi">0</span>
+      </div>
+      <div class="ms-row">
+        <span class="ms-label">Total</span>
+        <span class="ms-value total" id="val-total">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating penalty display -->
+  <div id="penalty-flash">-15,000</div>
+
+  <!-- Honk graphic -->
+  <div id="honkGraphic">HONK!!!</div>
+
+  <!-- TOUCH CONTROLS (visible only on touch screens via CSS media query) -->
+  <div id="touch-controls">
+    <!-- Left cluster: steering -->
+    <div class="tc-cluster tc-cluster-left">
+      <button id="btn-left"  class="tc-btn tc-steer" aria-label="Steer Left">&#9664;</button>
+      <button id="btn-right" class="tc-btn tc-steer" aria-label="Steer Right">&#9654;</button>
+    </div>
+    <!-- Right cluster: throttle -->
+    <div class="tc-cluster tc-cluster-right">
+      <button id="btn-accel" class="tc-btn tc-accel" aria-label="Accelerate">&#9650;</button>
+      <button id="btn-brake" class="tc-btn tc-brake" aria-label="Brake">&#9660;</button>
+    </div>
+  </div>
+
+  <!-- PAUSE OVERLAY -->
+  <div id="pause-overlay" class="hidden">
+    <div class="pause-card">
+      <div class="pause-title">PAUSED</div>
+      <div class="pause-hint">Press ESC to resume</div>
+    </div>
+  </div>
+
+  <!-- VICTORY MODAL -->
+  <div id="victory-modal" class="hidden">
+    <div class="vm-card">
+      <div class="vm-title">RALLY COMPLETE!</div>
+      <div class="vm-stats">
+        <div class="vm-row"><span class="vm-label">Final Time</span><span class="vm-val" id="vm-time">--</span></div>
+        <div class="vm-row"><span class="vm-label">Penalties</span><span class="vm-val red" id="vm-penalties">0</span></div>
+        <div class="vm-row"><span class="vm-label">Connections</span><span class="vm-val gold" id="vm-total">0</span></div>
+      </div>
+      <button class="vm-btn" onclick="victoryPlayAgain()">&#9654; PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- JS modules in dependency order -->
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/game.js"></script>
+
+</body>
+</html>
