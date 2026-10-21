@@ -42,8 +42,11 @@
     $('#portal').hidden = true;
     $('#greeter').hidden = false;
     $('.nav').classList.remove('open');
-    window.scrollTo(0, 0);
     history.replaceState(null, '', window.location.pathname + window.location.search);
+    requestAnimationFrame(function () {
+      var t = $('#grStart');
+      if (t) t.scrollIntoView(still() ? undefined : { behavior: 'smooth', block: 'start' });
+    });
   }
 
   function showTab(tab) {
