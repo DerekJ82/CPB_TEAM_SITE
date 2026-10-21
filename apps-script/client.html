@@ -921,7 +921,10 @@ var _CANADA_CITIES = {
   'mississauga': [43.589, -79.6441], 'hamilton': [43.2557, -79.8711],
   'montreal': [45.5017, -73.5673], 'quebec city': [46.8139, -71.208],
   'halifax': [44.6488, -63.5752], "st. john's": [47.5615, -52.7126],
-  "st john's": [47.5615, -52.7126]
+  "st john's": [47.5615, -52.7126],
+  'port coquitlam': [49.2625, -122.7811], 'port moody': [49.2831, -122.8319],
+  'vaughan': [43.8361, -79.4983], 'aurora': [44.0069, -79.4504],
+  'waterloo': [43.4668, -80.5164], "nun's island": [45.459, -73.562]
 };
 
 function _getCityCoords(turf) {
@@ -931,6 +934,8 @@ function _getCityCoords(turf) {
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     // remove province suffix with or without comma: "Vancouver, BC" or "Vancouver BC"
     .replace(/[,\s]+(bc|ab|sk|mb|on|qc|nb|ns|pe|nl|nt|nu|yt)\b.*$/, '').trim()
+    // remove full province names: "Waterloo, Ontario" → "waterloo"
+    .replace(/[,\s]+(ontario|british columbia|alberta|saskatchewan|manitoba|quebec|new brunswick|nova scotia|prince edward island|newfoundland|northwest territories|nunavut|yukon)\b.*$/i, '').trim()
     // remove trailing "canada"
     .replace(/[,\s]+canada\s*$/, '').trim();
   return _CANADA_CITIES[key] || null;
