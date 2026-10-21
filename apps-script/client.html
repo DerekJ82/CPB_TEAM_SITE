@@ -1988,13 +1988,21 @@ function initRosterMap() {
   function renderCalendar() {
     var body = document.getElementById('cal-events-body');
     if (!body) return;
-    var data = window.CALENDAR_DATA;
-    if (!Array.isArray(data) || !data.length) {
+    var raw      = window.CALENDAR_DATA;
+    var events   = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.events) ? raw.events : []);
+    var calError = raw && raw.calError ? raw.calError : null;
+
+    if (calError) {
+      body.innerHTML = '<tr><td colspan="5" class="pipe-error">Calendar access error: ' + esc(calError) +
+        ' — re-authorize the web app in Apps Script (Deploy &rarr; Manage deployments) to grant Calendar access.</td></tr>';
+      return;
+    }
+    if (!events.length) {
       body.innerHTML = '<tr><td colspan="5" class="pipe-empty">No upcoming events in the next 90 days.</td></tr>';
       return;
     }
     var typeCls = { meeting: 'info', deadline: 'bad', milestone: 'warn', event: 'ok' };
-    body.innerHTML = data.map(function (e) {
+    body.innerHTML = events.map(function (e) {
       var t   = (e.type || 'event').toLowerCase();
       var cls = typeCls[t] || 'ok';
       var lbl = t.charAt(0).toUpperCase() + t.slice(1);

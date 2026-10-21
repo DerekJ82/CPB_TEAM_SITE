@@ -318,7 +318,8 @@ function syncTeamData() {
 // Set CALENDAR_EVENTS_SHEET_ID in Script Properties to enable the Sheet source.
 
 function getCalendarData() {
-  var events = [];
+  var events   = [];
+  var calError = null;
   var now    = new Date();
   var end    = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
   var tz     = Session.getScriptTimeZone();
@@ -337,6 +338,7 @@ function getCalendarData() {
     });
   } catch (ex) {
     Logger.log('CalendarApp error: ' + ex);
+    calError = String(ex);
   }
 
   var sheetId = PropertiesService.getScriptProperties().getProperty('CALENDAR_EVENTS_SHEET_ID');
@@ -372,7 +374,7 @@ function getCalendarData() {
   }
 
   events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
-  return JSON.stringify(events);
+  return JSON.stringify({ events: events, calError: calError });
 }
 
 
