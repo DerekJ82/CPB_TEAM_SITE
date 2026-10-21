@@ -625,8 +625,9 @@ a{color:var(--purple)}
 
 /* --- Roster map ----------------------------------------------------------- */
 .roster-map-wrap{position:relative;margin-top:4px}
-#roster-map{height:calc(100vh - var(--navh) - 140px);min-height:480px;max-height:860px;
-  border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.roster-map-split{display:flex;gap:6px;
+  height:calc(100vh - var(--navh) - 140px);min-height:400px;max-height:680px}
+.roster-map-split>div{flex:1;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
 .leaflet-div-icon{background:transparent!important;border:none!important}
 .pin-dot{width:36px;height:36px;border-radius:50%;
   background:var(--purple);color:#fff;
@@ -644,7 +645,7 @@ a{color:var(--purple)}
   padding:7px 16px;font-size:13px;font-weight:600;font-family:var(--text);
   cursor:pointer;display:none;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #roster-map-reset:hover{background:var(--purple-l)}
-#roster-map .leaflet-container,
-#roster-map .leaflet-grab{cursor:default!important}
+.roster-map-split .leaflet-container,
+.roster-map-split .leaflet-grab{cursor:default!important}
 
 </style>

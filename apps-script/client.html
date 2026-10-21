@@ -948,7 +948,7 @@ function _resetRosterMap(markerList, resetBtn) {
 function _getPinCoords(center, index, total) {
   if (total === 1) return center;
   // Arrange in a circle around the city; compensate lng scale at ~55N (cos 55° ≈ 0.57)
-  var r = 1.0;
+  var r = 0.5;
   var angle = (2 * Math.PI * index / total) - (Math.PI / 2);
   return [
     center[0] + r * Math.cos(angle),
@@ -960,44 +960,36 @@ function initRosterMap() {
   if (_rosterMapInited || typeof L === 'undefined') return;
   _rosterMapInited = true;
 
-  var _CANADA_BOUNDS = [[41.5, -142], [62, -50]];
-  var map = L.map('roster-map', {
-    center: [54, -96],
-    zoom: 4,
-    zoomControl: false,
-    scrollWheelZoom: false,
-    doubleClickZoom: false,
-    dragging: false,
-    touchZoom: false,
-    boxZoom: false,
-    keyboard: false,
-    tap: false
-  });
+  var _BC_BOUNDS   = [[47.5, -128.5], [55, -114.5]];
+  var _EAST_BOUNDS = [[41.5, -86],    [48.5, -63]];
+  var _TILE        = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  var _TILE_OPT    = { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 };
+  var _MAP_OPT     = { zoomControl: false, scrollWheelZoom: false, doubleClickZoom: false, dragging: false, touchZoom: false, boxZoom: false, keyboard: false, tap: false };
+
+  var mapBC   = L.map('roster-map-bc',   _MAP_OPT);
+  var mapEast = L.map('roster-map-east', _MAP_OPT);
+  L.tileLayer(_TILE, _TILE_OPT).addTo(mapBC);
+  L.tileLayer(_TILE, _TILE_OPT).addTo(mapEast);
+
   // Re-fit after two animation frames so Leaflet measures the real
-  // container height (the tabview was display:none during page load)
+  // container dimensions (tabview was display:none during page load)
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
-      map.invalidateSize();
-      map.fitBounds(_CANADA_BOUNDS);
+      mapBC.invalidateSize();   mapBC.fitBounds(_BC_BOUNDS);
+      mapEast.invalidateSize(); mapEast.fitBounds(_EAST_BOUNDS);
     });
   });
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19
-  }).addTo(map);
 
   var resetBtn = document.getElementById('roster-map-reset');
   var markerList = [];
 
-  // Group cards by city so duplicates can be spread out
+  // Group cards by city so same-city duplicates can be spread out
   var cityGroups = {};
   document.querySelectorAll('#team-cards-data .team-card').forEach(function (card) {
     var stats = {};
     try { stats = JSON.parse(card.getAttribute('data-card') || '{}'); } catch (e) {}
     var coords = _getCityCoords(stats.turf);
     if (!coords) return;
-
     var key = coords[0].toFixed(2) + ',' + coords[1].toFixed(2);
     if (!cityGroups[key]) cityGroups[key] = { center: coords, members: [] };
     cityGroups[key].members.push({
@@ -1011,21 +1003,20 @@ function initRosterMap() {
   Object.keys(cityGroups).forEach(function (key) {
     var group  = cityGroups[key];
     var total  = group.members.length;
+    var m      = group.center[1] < -100 ? mapBC : mapEast;
 
     group.members.forEach(function (member, i) {
       var pinCoords = _getPinCoords(group.center, i, total);
 
-      // Leader line from offset pin back to the real city dot
       if (total > 1) {
         L.polyline([pinCoords, group.center], {
           color: '#4B286D', weight: 1.5, opacity: 0.4, dashArray: '5 5'
-        }).addTo(map);
-        // Small dot at the true city location
+        }).addTo(m);
         if (i === 0) {
           L.circleMarker(group.center, {
             radius: 4, color: '#4B286D', fillColor: '#4B286D',
             fillOpacity: 0.35, weight: 1.5, opacity: 0.5, interactive: false
-          }).addTo(map);
+          }).addTo(m);
         }
       }
 
@@ -1044,7 +1035,7 @@ function initRosterMap() {
         window.openRosterModal(member.card);
       });
 
-      marker.addTo(map);
+      marker.addTo(m);
       markerList.push({ marker: marker, card: member.card, teamKey: member.teamKey });
     });
   });
