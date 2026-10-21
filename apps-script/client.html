@@ -201,13 +201,14 @@
         var existing = {};
         try { existing = JSON.parse(card.getAttribute('data-card') || '{}'); } catch (e) {}
 
+        function _v(s, e) { return (s && s !== '?') ? s : (e || '?'); }
         card.setAttribute('data-card', JSON.stringify({
-          song:    synced.song    || existing.song    || '?',
-          gateway: synced.gateway || existing.gateway || '?',
-          report:  synced.report  || existing.report  || '?',
-          meal:    synced.meal    || existing.meal    || '?',
-          turf:    synced.turf    || existing.turf    || '?',
-          rookie:  synced.rookie  || existing.rookie  || '?'
+          song:    _v(synced.song,    existing.song),
+          gateway: _v(synced.gateway, existing.gateway),
+          report:  _v(synced.report,  existing.report),
+          meal:    _v(synced.meal,    existing.meal),
+          turf:    _v(synced.turf,    existing.turf),
+          rookie:  _v(synced.rookie,  existing.rookie)
         }));
       });
     }
@@ -899,8 +900,8 @@ var _CANADA_CITIES = {
   'halifax': [44.6488, -63.5752], "st. john's": [47.5615, -52.7126],
   "st john's": [47.5615, -52.7126],
   'port coquitlam': [49.2625, -122.7811], 'port moody': [49.2831, -122.8319],
-  'vaughan': [44.45, -79.9], 'aurora': [44.8, -79.1],
-  'waterloo': [43.2, -81.0], "nun's island": [45.459, -73.562],
+  'vaughan': [44.45, -79.9], 'aurora': [46.5, -79.0],
+  'waterloo': [42.7, -81.5], "nun's island": [45.0, -73.9],
   'bromont': [45.317, -72.650]
 };
 
@@ -947,7 +948,7 @@ function _resetRosterMap(markerList, resetBtn) {
 function _getPinCoords(center, index, total) {
   if (total === 1) return center;
   // Arrange in a circle around the city; compensate lng scale at ~55N (cos 55° ≈ 0.57)
-  var r = 3.5;
+  var r = 1.0;
   var angle = (2 * Math.PI * index / total) - (Math.PI / 2);
   return [
     center[0] + r * Math.cos(angle),
