@@ -15,7 +15,8 @@
 <script>window.TEAM_CARD_DATA = <?!= teamCardData ?>;</script>
 <script>window.PET_CARD_DATA  = <?!= petCardData  ?>;</script>
 <script>window.CALENDAR_DATA  = <?!= calendarData ?>;</script>
-<script>window.TASKS_DATA     = <?!= tasksData    ?>;</script>
+<script>window.TASKS_DATA      = <?!= tasksData     ?>;</script>
+<script>window.TASKS_SHEET_URL  = '<?!= tasksSheetUrl ?>';</script>
 
 <!-- ============================== GREETER ============================== -->
 <div id="greeter">
@@ -560,6 +561,11 @@
       <div class="pad">
         <div class="sect-head reveal">
           <h3 class="h3">Tasks</h3>
+          <? if (tasksSheetUrl) { ?>
+          <a href="<?!= tasksSheetUrl ?>" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none">
+            Edit in Sheet &rarr;
+          </a>
+          <? } ?>
           <div class="swap reveal" id="tasks-filter" style="margin-top:16px">
             <div class="swap-bar">
               <button class="swap-b on" data-wrap="tasks-filter" data-i="0" onclick="filterTasks('all')">All</button>

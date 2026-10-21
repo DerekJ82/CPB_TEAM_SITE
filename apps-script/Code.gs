@@ -18,8 +18,10 @@ function doGet(e) {
   tmpl.execUrl = ScriptApp.getService().getUrl();
   tmpl.teamCardData = PropertiesService.getScriptProperties().getProperty('TEAM_CARD_DATA') || '{}';
   tmpl.petCardData  = PropertiesService.getScriptProperties().getProperty('PET_CARD_DATA')  || '{}';
-  tmpl.calendarData = getCalendarData();
-  tmpl.tasksData    = getTasksData();
+  tmpl.calendarData  = getCalendarData();
+  tmpl.tasksData     = getTasksData();
+  var _tasksId = PropertiesService.getScriptProperties().getProperty('TASKS_SHEET_ID');
+  tmpl.tasksSheetUrl = _tasksId ? 'https://docs.google.com/spreadsheets/d/' + _tasksId : '';
   return tmpl.evaluate()
     .setTitle('EPB Team Site')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
