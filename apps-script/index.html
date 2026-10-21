@@ -228,7 +228,7 @@
         <p class="team-name">Kevin Mao</p>
         <p class="team-role">Sr. Strategy Manager</p>
       </div>
-      <div class="team-card" data-mgr="windy" data-card='{"song":"?","gateway":"?","report":"?","meal":"?","turf":"?","rookie":"?"}'>
+      <div class="team-card" data-mgr="windy" data-card='{"song":"Jungle - Back on 74","gateway":"Maldives","report":"I have won the Showcase Showdown on The Price is Right","meal":"Korean short ribs","turf":"Montreal","rookie":"2024"}'>
         <div class="team-init">JL</div>
         <p class="team-name">Jonathan Lum</p>
         <p class="team-role">Sr. Strategy Manager</p>
@@ -561,11 +561,9 @@
       <div class="pad">
         <div class="sect-head reveal">
           <h3 class="h3">Tasks</h3>
-          <? if (tasksSheetUrl) { ?>
-          <a href="<?!= tasksSheetUrl ?>" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none">
+          <a id="tasks-sheet-pill" href="#" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none" hidden>
             Edit in Sheet &rarr;
           </a>
-          <? } ?>
           <div class="swap reveal" id="tasks-filter" style="margin-top:16px">
             <div class="swap-bar">
               <button class="swap-b on" data-wrap="tasks-filter" data-i="0" onclick="filterTasks('all')">All</button>

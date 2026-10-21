@@ -899,8 +899,8 @@ var _CANADA_CITIES = {
   'halifax': [44.6488, -63.5752], "st. john's": [47.5615, -52.7126],
   "st john's": [47.5615, -52.7126],
   'port coquitlam': [49.2625, -122.7811], 'port moody': [49.2831, -122.8319],
-  'vaughan': [43.8361, -79.4983], 'aurora': [44.0069, -79.4504],
-  'waterloo': [43.4668, -80.5164], "nun's island": [45.459, -73.562],
+  'vaughan': [44.45, -79.9], 'aurora': [44.8, -79.1],
+  'waterloo': [43.2, -81.0], "nun's island": [45.459, -73.562],
   'bromont': [45.317, -72.650]
 };
 
@@ -947,7 +947,7 @@ function _resetRosterMap(markerList, resetBtn) {
 function _getPinCoords(center, index, total) {
   if (total === 1) return center;
   // Arrange in a circle around the city; compensate lng scale at ~55N (cos 55° ≈ 0.57)
-  var r = 2.2;
+  var r = 3.5;
   var angle = (2 * Math.PI * index / total) - (Math.PI / 2);
   return [
     center[0] + r * Math.cos(angle),
@@ -2024,6 +2024,8 @@ function initRosterMap() {
   function renderTasks() {
     var body = document.getElementById('tasks-body');
     if (!body) return;
+    var pill = document.getElementById('tasks-sheet-pill');
+    if (pill && window.TASKS_SHEET_URL) { pill.href = window.TASKS_SHEET_URL; pill.hidden = false; }
     var data = window.TASKS_DATA;
     if (!Array.isArray(data) || !data.length) {
       body.innerHTML = '<tr><td colspan="6" class="pipe-empty">No tasks found. Add rows to the EPB Tasks Sheet.</td></tr>';
