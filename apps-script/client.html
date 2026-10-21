@@ -339,7 +339,7 @@
     }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
   }
 
-  /* --- Pipeline data (shared across PSO / CBR / Queries) ----------------- */
+  /* --- Pipeline data (shared across PSO / Queries) ----------------------- */
   var _pipeData    = null;
   var _pipeLoading = false;
   var _pipeCbs     = [];
@@ -363,33 +363,6 @@
         cbs.forEach(function (fn) { fn({ _error: msg }); });
       })
       .getDashboardData();
-  }
-
-  /* --- CBR tab ------------------------------------------------------------ */
-  observeTab('view-cbr', function () {
-    var el = document.getElementById('cbr-body');
-    if (el && !_pipeData) el.innerHTML = '<p class="pipe-loading">Loading pipeline data&hellip;</p>';
-    _loadPipeData(renderCBR);
-  });
-
-  function renderCBR(data) {
-    var el = document.getElementById('cbr-body');
-    if (!el) return;
-    if (data._error) { el.innerHTML = '<p class="pipe-error">' + _esc(data._error) + '</p>'; return; }
-    var d = data.cbr;
-    if (!d || d.error) { el.innerHTML = '<p class="pipe-error">' + _esc(d ? d.error : 'No CBR data') + '</p>'; return; }
-
-    var segs = (d.segments || []).map(function (s) {
-      return '<div class="gcard"><h4>' + _esc(s.name) + '</h4>' + _badge(s.status) + '</div>';
-    }).join('');
-
-    el.innerHTML =
-      '<div class="gstats reveal">' +
-        '<div class="gstat"><b>' + _esc(d.currentPeriod || '—') + '</b><span>Current period</span></div>' +
-        '<div class="gstat"><b>' + d.completeCount + '&thinsp;/&thinsp;' + d.totalCount + '</b><span>Segments loaded</span></div>' +
-        '<div class="gstat">' + _badge(d.status) + '<span>Overall status</span></div>' +
-      '</div>' +
-      (segs ? '<div class="gcards reveal">' + segs + '</div>' : '<p class="pipe-empty">No segment data found.</p>');
   }
 
   /* --- Queries tab -------------------------------------------------------- */
