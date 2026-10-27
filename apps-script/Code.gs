@@ -319,7 +319,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v5';
+  var cacheKey = 'cal_data_v6';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -332,6 +332,14 @@ function getCalendarData() {
   var tz     = Session.getScriptTimeZone();
 
   try {
+    // Log all accessible calendars so we can identify the Team Calendar ID/name
+    var allCals = CalendarApp.getAllCalendars();
+    Logger.log('=== ACCESSIBLE CALENDARS (' + allCals.length + ') ===');
+    allCals.forEach(function(c, i) {
+      var evCount = c.getEvents(now, end).length;
+      Logger.log('[' + i + '] name="' + c.getName() + '" id="' + c.getId() + '" events90d=' + evCount);
+    });
+
     var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
     if (!cal) {
       calError = 'Calendar derek.johnson@telus.com not found — check authorization.';
@@ -352,7 +360,7 @@ function getCalendarData() {
           });
         }
       });
-      Logger.log('Color distribution: ' + JSON.stringify(colorCounts));
+      Logger.log('Color distribution (primary cal): ' + JSON.stringify(colorCounts));
       Logger.log('Calendar loaded: ' + events.length + ' team events (colors 7/8/9) from derek.johnson@telus.com');
     }
   } catch (ex) {
