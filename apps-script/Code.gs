@@ -364,7 +364,11 @@ function getCalendarData() {
           events.push({
             date:      Utilities.formatDate(d, tz, 'yyyy-MM-dd'),
             dateLabel: Utilities.formatDate(d, tz, 'MMM d'),
-            time:      iTime  >= 0 ? String(row[iTime]).trim()  : '',
+            time:      (function() {
+              if (iTime < 0 || !row[iTime]) return '';
+              var t = row[iTime];
+              return t instanceof Date ? Utilities.formatDate(t, tz, 'h:mm a') : String(t).trim();
+            })(),
             title:     iTitle >= 0 ? String(row[iTitle]).trim() : '',
             type:      iType  >= 0 ? String(row[iType]).trim()  : 'Team Calendar',
             owner:     iOwner >= 0 ? String(row[iOwner]).trim() : '',

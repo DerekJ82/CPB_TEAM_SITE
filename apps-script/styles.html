@@ -653,9 +653,10 @@ a{color:var(--purple)}
   text-transform:uppercase;letter-spacing:.09em;color:var(--purple);
   padding-bottom:10px;border-bottom:2px solid var(--purple);margin:32px 0 16px}
 .cal-group-hd:first-child{margin-top:0}
-.cal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:clamp(14px,2vw,22px)}
+.cal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:clamp(14px,2vw,22px);align-items:stretch}
 .cal-card{background:#fff;border:1px solid var(--line);border-radius:12px;
   padding:clamp(18px,2.2vw,26px);box-shadow:0 1px 4px rgba(0,0,0,.07);
+  min-height:110px;display:flex;flex-direction:column;
   transition:box-shadow .2s,transform .2s,border-color .2s}
 .cal-card:hover{box-shadow:0 5px 16px rgba(0,0,0,.11);transform:translateY(-2px);border-color:var(--purple)}
 .cal-card-title{font-family:var(--disp);font-weight:900;font-size:clamp(16px,1.8vw,20px);
