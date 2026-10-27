@@ -319,7 +319,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v2';
+  var cacheKey = 'cal_data_v3';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -337,17 +337,19 @@ function getCalendarData() {
       calError = 'Calendar derek.johnson@telus.com not found — check authorization.';
     } else {
       cal.getEvents(now, end).forEach(function(ev) {
-        var start = ev.getStartTime();
-        events.push({
-          date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
-          dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
-          title:     ev.getTitle(),
-          type:      'meeting',
-          owner:     ((ev.getCreators() || [])[0] || ''),
-          notes:     (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim()
-        });
+        if (ev.getColor() === '9' || ev.getColor() === CalendarApp.EventColor.BLUE) {
+          var start = ev.getStartTime();
+          events.push({
+            date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
+            dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
+            title:     ev.getTitle(),
+            type:      'Team Calendar',
+            owner:     ((ev.getCreators() || [])[0] || ''),
+            notes:     (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim()
+          });
+        }
       });
-      Logger.log('Calendar loaded: ' + events.length + ' events from derek.johnson@telus.com');
+      Logger.log('Calendar loaded: ' + events.length + ' team events from derek.johnson@telus.com');
     }
   } catch (ex) {
     Logger.log('CalendarApp error: ' + ex);
