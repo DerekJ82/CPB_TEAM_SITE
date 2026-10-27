@@ -379,20 +379,27 @@
   function renderQueries(data) {
     var el = document.getElementById('queries-body');
     if (!el) return;
-    if (data._error) { el.innerHTML = '<p class="pipe-error">' + _esc(data._error) + '</p>'; return; }
+
+    function setHtml(html) {
+      el.innerHTML = html;
+      $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
+    }
+
+    if (data._error) { setHtml('<p class="pipe-error">' + _esc(data._error) + '</p>'); return; }
     var d = data.queries;
-    if (!d || d.error) { el.innerHTML = '<p class="pipe-error">' + _esc(d ? d.error : 'No queries data') + '</p>'; return; }
+    if (!d || d.error) { setHtml('<p class="pipe-error">' + _esc(d ? d.error : 'No queries data') + '</p>'); return; }
 
     // CONFIG sheet not yet initialized
     if (!d.currentPeriod) {
-      el.innerHTML =
+      setHtml(
         '<div class="gnote reveal">' +
           '<span class="dsr-icon" aria-hidden="true">!</span>' +
           '<div><h4 class="gnote-h">Config not initialized</h4>' +
           '<p class="gnote-p">Run <code>initBRConfigSheet()</code> from the Apps Script editor, ' +
           'then <code>scheduleMonthlyBRNotification()</code> to set the current period.</p></div>' +
         '</div>' +
-        '<p class="pipe-link"><a href="' + _esc(d.trackerUrl || '#') + '" target="_blank" rel="noopener">Open tracker sheet &rarr;</a></p>';
+        '<p class="pipe-link"><a href="' + _esc(d.trackerUrl || '#') + '" target="_blank" rel="noopener">Open tracker sheet &rarr;</a></p>'
+      );
       return;
     }
 
@@ -448,7 +455,7 @@
 
     var pct = Math.round((d.stage / (d.totalStages || 4)) * 100);
 
-    el.innerHTML =
+    setHtml(
       '<div class="gstats reveal">' +
         '<div class="gstat"><b>' + _esc(_fmtPeriod(d.currentPeriod)) + '</b><span>Current period</span></div>' +
         '<div class="gstat"><b>Stage ' + d.stage + '&thinsp;/&thinsp;' + (d.totalStages || 4) +
@@ -463,8 +470,8 @@
         '<tbody>' + tableRows + '</tbody>' +
       '</table></div>' +
       controls +
-      '<p class="pipe-link"><a href="' + _esc(d.trackerUrl || '#') + '" target="_blank" rel="noopener">Open tracker sheet &rarr;</a></p>';
-    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
+      '<p class="pipe-link"><a href="' + _esc(d.trackerUrl || '#') + '" target="_blank" rel="noopener">Open tracker sheet &rarr;</a></p>'
+    );
   }
 
   function _fmtPeriod(yyyyMm) {
