@@ -1216,25 +1216,26 @@ function sendAnniversaryNudges() {
     return;
   }
 
-  var tz  = 'America/Vancouver';
-  var now = new Date();
-
-  // On Fridays, also cover Saturday (+1), Sunday (+2), and Monday (+3) so
-  // weekend/Monday anniversaries are announced on the last business day before.
+  var tz       = 'America/Vancouver';
+  var now      = new Date();
   var todayDow = parseInt(Utilities.formatDate(now, tz, 'u'), 10); // 1=Mon … 7=Sun
-  var lookaheadDays = [1]; // always check tomorrow
-  if (todayDow === 5) lookaheadDays = [1, 2, 3]; // Friday: cover Sat, Sun, Mon
+
+  // Send on the day of the anniversary (offset 0 = today).
+  // On Fridays also cover Saturday (+1) and Sunday (+2) so weekend
+  // anniversaries get announced on the last business day before.
+  var offsets = [0];
+  if (todayDow === 5) offsets = [0, 1, 2]; // Friday: also check Sat & Sun
 
   var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   var sent = 0;
-  lookaheadDays.forEach(function(offset) {
-    var target      = new Date(now.getTime() + offset * 86400000);
-    var tMonth      = parseInt(Utilities.formatDate(target, tz, 'M'),    10);
-    var tDay        = parseInt(Utilities.formatDate(target, tz, 'd'),    10);
-    var tYear       = parseInt(Utilities.formatDate(target, tz, 'yyyy'), 10);
-    var isEarlyNote = offset > 1; // true for Sun (+2) and Mon (+3) on a Friday
-    var targetDow   = parseInt(Utilities.formatDate(target, tz, 'u'),   10);
+  offsets.forEach(function(offset) {
+    var target     = new Date(now.getTime() + offset * 86400000);
+    var tMonth     = parseInt(Utilities.formatDate(target, tz, 'M'),    10);
+    var tDay       = parseInt(Utilities.formatDate(target, tz, 'd'),    10);
+    var tYear      = parseInt(Utilities.formatDate(target, tz, 'yyyy'), 10);
+    var isEarly    = offset > 0; // true only for weekend dates announced on Friday
+    var targetDow  = parseInt(Utilities.formatDate(target, tz, 'u'),   10);
 
     _ANNIVERSARY_MEMBERS.forEach(function(m) {
       if (m.month !== tMonth || m.day !== tDay) return;
@@ -1242,18 +1243,17 @@ function sendAnniversaryNudges() {
       if (years < 1) return;
 
       var dateStr    = monthNames[tMonth - 1] + ' ' + tDay;
-      var whenPhrase = offset === 1 ? 'tomorrow' : 'on ' + dateStr;
+      var whenPhrase = isEarly ? 'this weekend (' + dateStr + ')' : 'today';
       var earlyNote  = '';
-      if (isEarlyNote) {
-        var dayName = targetDow === 6 ? 'Saturday' : (targetDow === 7 ? 'Sunday' : 'Monday');
-        earlyNote = '\n_(Heads up sent early — their actual anniversary falls on ' + dayName + ', ' + dateStr + '.)_';
+      if (isEarly) {
+        var dayName = targetDow === 6 ? 'Saturday' : 'Sunday';
+        earlyNote = '\n_(Sending this early — their anniversary falls on ' + dayName + ', ' + dateStr + ' and I didn\'t want the weekend to go by without a shoutout!)_';
       }
 
       var msg =
         'Good morning Team! 👋\n\n' +
         '🎉 *Anniversary Alert!*\n\n' +
-        '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* ' + whenPhrase +
-        ' and I wanted to let the team know ahead of time.\n\n' +
+        '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* ' + whenPhrase + '!\n\n' +
         years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' +
         m.name.split(' ')[0] + '! 🙌' + earlyNote;
 
@@ -1264,7 +1264,7 @@ function sendAnniversaryNudges() {
           muteHttpExceptions: true,
           payload: JSON.stringify({ text: msg })
         });
-        Logger.log('sendAnniversaryNudges: sent for ' + m.name + ' (' + years + 'y, +' + offset + 'd) — HTTP ' + resp.getResponseCode());
+        Logger.log('sendAnniversaryNudges: sent for ' + m.name + ' (' + years + 'y' + (isEarly ? ', early' : '') + ') — HTTP ' + resp.getResponseCode());
         sent++;
       } catch (e) {
         Logger.log('sendAnniversaryNudges error for ' + m.name + ': ' + e);
