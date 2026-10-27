@@ -464,7 +464,7 @@
       '</table></div>' +
       controls +
       '<p class="pipe-link"><a href="' + _esc(d.trackerUrl || '#') + '" target="_blank" rel="noopener">Open tracker sheet &rarr;</a></p>';
-    initReveal(el);
+    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
   }
 
   function _fmtPeriod(yyyyMm) {
@@ -1466,7 +1466,7 @@ function initRosterMap() {
       '</div>';
 
     el.innerHTML = header + gauges + partAlert + _engHighlights(cur, prev);
-    initReveal(el);
+    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
 
     // Trigger fill animations after paint (CSS transition fires when dashoffset changes)
     requestAnimationFrame(function () {
@@ -1663,7 +1663,7 @@ function initRosterMap() {
       '<canvas id="eng-chart-core"></canvas></div>' +
       '<div class="eng-chart-group reveal"><h3 class="eng-chart-h">Participation &amp; eNPS</h3>' +
       '<canvas id="eng-chart-part"></canvas></div>';
-    initReveal(el);
+    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
 
     if (typeof Chart === 'undefined') {
       el.innerHTML = '<p class="pipe-error">Chart.js failed to load. Check your network connection.</p>';
@@ -1773,7 +1773,7 @@ function initRosterMap() {
       '<div class="gt-wrap reveal" style="margin-top:1.5rem">' +
         '<pre id="eng-report-pre" class="eng-report-pre"></pre>' +
       '</div>';
-    initReveal(el);
+    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
 
     function update() {
       var idx = Number(document.getElementById('eng-period-sel').value);
@@ -1911,7 +1911,7 @@ function initRosterMap() {
     el.innerHTML = '<div class="gt-wrap reveal">' +
       '<table class="gt">' + headerRow + '<tbody>' + bodyRows + '</tbody></table>' +
       '</div>';
-    initReveal(el);
+    $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
   }
 
   // ── Inline styles ──────────────────────────────────────────────────────────
