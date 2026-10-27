@@ -14,14 +14,15 @@ function doGet(e) {
   }
 
   var tmpl = HtmlService.createTemplateFromFile('index');
+  var props = PropertiesService.getScriptProperties();
   tmpl.isAdmin = _isAdminUser();
   tmpl.execUrl = ScriptApp.getService().getUrl();
-  tmpl.teamCardData = PropertiesService.getScriptProperties().getProperty('TEAM_CARD_DATA') || '{}';
-  tmpl.petCardData  = PropertiesService.getScriptProperties().getProperty('PET_CARD_DATA')  || '{}';
+  tmpl.teamCardData = props.getProperty('TEAM_CARD_DATA') || '{}';
+  tmpl.petCardData  = props.getProperty('PET_CARD_DATA')  || '{}';
   tmpl.calendarData  = JSON.stringify(getCalendarData()).replace(/<\/script/gi, '<\\/script');
   tmpl.tasksData     = getTasksData();
-  var _tasksId = PropertiesService.getScriptProperties().getProperty('TASKS_SHEET_ID');
-  tmpl.tasksSheetUrl = _tasksId ? 'https://docs.google.com/spreadsheets/d/' + _tasksId : '';
+  var _sheetId = props.getProperty('TEAM_SHEET_ID') || props.getProperty('TASKS_SHEET_ID');
+  tmpl.tasksSheetUrl = _sheetId ? 'https://docs.google.com/spreadsheets/d/' + _sheetId : '';
   return tmpl.evaluate()
     .setTitle('EPB Team Site')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
@@ -317,9 +318,15 @@ function syncTeamData() {
 // optional CALENDAR_EVENTS_SHEET_ID Sheet (Date | Title | Type | Owner | Notes).
 // Set CALENDAR_EVENTS_SHEET_ID in Script Properties to enable the Sheet source.
 
+// ─── Calendar Data ────────────────────────────────────────────────────────────
+// Reads from the "Team Calendar" tab of TEAM_SHEET_ID (falls back to the
+// first sheet of CALENDAR_EVENTS_SHEET_ID for backward compat).
+// Populate the sheet by running syncTeamCalendar() from the Apps Script editor,
+// or add rows manually — the Source column ("auto" / blank) is ignored here.
+
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v6';
+  var cacheKey = 'cal_data_v7';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -327,51 +334,18 @@ function getCalendarData() {
 
   var events   = [];
   var calError = null;
-  var now    = new Date();
-  var end    = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
-  var tz     = Session.getScriptTimeZone();
+  var now      = new Date();
+  var tz       = Session.getScriptTimeZone();
+  var props    = PropertiesService.getScriptProperties();
+  var sheetId  = props.getProperty('TEAM_SHEET_ID') || props.getProperty('CALENDAR_EVENTS_SHEET_ID');
 
-  try {
-    // Log all accessible calendars so we can identify the Team Calendar ID/name
-    var allCals = CalendarApp.getAllCalendars();
-    Logger.log('=== ACCESSIBLE CALENDARS (' + allCals.length + ') ===');
-    allCals.forEach(function(c, i) {
-      var evCount = c.getEvents(now, end).length;
-      Logger.log('[' + i + '] name="' + c.getName() + '" id="' + c.getId() + '" events90d=' + evCount);
-    });
-
-    var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
-    if (!cal) {
-      calError = 'Calendar derek.johnson@telus.com not found — check authorization.';
-    } else {
-      var colorCounts = {};
-      cal.getEvents(now, end).forEach(function(ev) {
-        var c = ev.getColor() || '(none)';
-        colorCounts[c] = (colorCounts[c] || 0) + 1;
-        if (c === '9' || c === '8' || c === '7') {
-          var start = ev.getStartTime();
-          events.push({
-            date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
-            dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
-            title:     ev.getTitle(),
-            type:      'Team Calendar',
-            owner:     ((ev.getCreators() || [])[0] || ''),
-            notes:     (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim()
-          });
-        }
-      });
-      Logger.log('Color distribution (primary cal): ' + JSON.stringify(colorCounts));
-      Logger.log('Calendar loaded: ' + events.length + ' team events (colors 7/8/9) from derek.johnson@telus.com');
-    }
-  } catch (ex) {
-    Logger.log('CalendarApp error: ' + ex);
-    calError = String(ex);
-  }
-
-  var sheetId = PropertiesService.getScriptProperties().getProperty('CALENDAR_EVENTS_SHEET_ID');
-  if (sheetId) {
+  if (!sheetId) {
+    calError = 'No TEAM_SHEET_ID set. Run setupTeamSheet() then syncTeamCalendar() from the Apps Script editor.';
+  } else {
     try {
-      var rows = SpreadsheetApp.openById(sheetId).getSheets()[0].getDataRange().getValues();
+      var ss  = SpreadsheetApp.openById(sheetId);
+      var tab = ss.getSheetByName('Team Calendar') || ss.getSheets()[0];
+      var rows = tab.getDataRange().getValues();
       if (rows.length > 1) {
         var headers = rows[0].map(function(h) { return String(h).trim().toLowerCase(); });
         var iDate   = headers.indexOf('date');
@@ -384,42 +358,173 @@ function getCalendarData() {
           var raw = iDate >= 0 ? row[iDate] : '';
           if (!raw) continue;
           var d = raw instanceof Date ? raw : new Date(raw);
-          if (isNaN(d)) continue;
+          if (isNaN(d.getTime())) continue;
+          if (d < now) continue;
           events.push({
             date:      Utilities.formatDate(d, tz, 'yyyy-MM-dd'),
             dateLabel: Utilities.formatDate(d, tz, 'MMM d'),
             title:     iTitle >= 0 ? String(row[iTitle]).trim() : '',
-            type:      iType  >= 0 ? String(row[iType]).trim().toLowerCase()  : 'event',
+            type:      iType  >= 0 ? String(row[iType]).trim()  : 'Team Calendar',
             owner:     iOwner >= 0 ? String(row[iOwner]).trim() : '',
             notes:     iNotes >= 0 ? String(row[iNotes]).trim() : ''
           });
         }
+        events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
       }
+      Logger.log('getCalendarData: ' + events.length + ' upcoming events from sheet');
     } catch (ex) {
-      Logger.log('Events sheet error: ' + ex);
+      Logger.log('getCalendarData sheet error: ' + ex);
+      calError = String(ex);
     }
   }
 
-  events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
   var resultObj = { events: events, calError: calError };
-  try { cache.put(cacheKey, JSON.stringify(resultObj), 900); } catch (e) {}  // 15-min cache
+  try { cache.put(cacheKey, JSON.stringify(resultObj), 900); } catch (e) {}
   return resultObj;
 }
 
 
+// ─── Sync Team Calendar to Sheet ─────────────────────────────────────────────
+// Reads Peacock-colored (color '7') events from derek.johnson@telus.com and
+// writes them as "auto" rows in the "Team Calendar" tab of TEAM_SHEET_ID.
+// Manually-added rows (Source column blank or not "auto") are preserved.
+//
+// Run this from the Apps Script editor (▶ Run > syncTeamCalendar) whenever
+// you want to refresh, or set a daily time-based trigger via:
+//   Triggers > Add Trigger > syncTeamCalendar > Time-driven > Day timer.
+
+function syncTeamCalendar() {
+  var sheetId = PropertiesService.getScriptProperties().getProperty('TEAM_SHEET_ID');
+  if (!sheetId) { Logger.log('syncTeamCalendar: TEAM_SHEET_ID not set — run setupTeamSheet() first.'); return; }
+
+  var ss  = SpreadsheetApp.openById(sheetId);
+  var tab = ss.getSheetByName('Team Calendar');
+  if (!tab) { Logger.log('syncTeamCalendar: "Team Calendar" tab not found — run setupTeamSheet() first.'); return; }
+
+  var now = new Date();
+  var end = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  var tz  = Session.getScriptTimeZone();
+
+  // Preserve manually-added rows (Source column blank or not "auto")
+  var existing = tab.getDataRange().getValues();
+  var headers  = existing[0];
+  var srcIdx   = headers.map(function(h) { return String(h).trim().toLowerCase(); }).indexOf('source');
+  var manualRows = existing.slice(1).filter(function(row) {
+    var src = srcIdx >= 0 ? String(row[srcIdx]).trim().toLowerCase() : '';
+    return src !== 'auto';
+  });
+
+  // Fetch Peacock ('7') events from Derek's primary calendar
+  var autoRows = [];
+  try {
+    var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
+    if (!cal) throw new Error('Calendar derek.johnson@telus.com not found.');
+    cal.getEvents(now, end).forEach(function(ev) {
+      if (ev.getColor() !== '7') return;
+      var start = ev.getStartTime();
+      autoRows.push([
+        Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
+        ev.getTitle(),
+        'Team Calendar',
+        ((ev.getCreators() || [])[0] || ''),
+        (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim(),
+        'auto'
+      ]);
+    });
+    autoRows.sort(function(a, b) { return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0; });
+  } catch (ex) {
+    Logger.log('syncTeamCalendar calendar error: ' + ex);
+  }
+
+  // Rewrite sheet: header + auto rows + manual rows
+  var allRows = [headers].concat(autoRows).concat(manualRows);
+  tab.clearContents();
+  tab.getRange(1, 1, allRows.length, headers.length).setValues(allRows);
+
+  // Invalidate cache so the next page load gets fresh data
+  try { CacheService.getScriptCache().remove('cal_data_v7'); } catch (e) {}
+
+  Logger.log('syncTeamCalendar: wrote ' + autoRows.length + ' auto + ' + manualRows.length + ' manual rows.');
+}
+
+
+// ─── One-time Sheet Setup ─────────────────────────────────────────────────────
+// Creates a new "CPB Team Site Data" spreadsheet with "Team Calendar" and
+// "Tasks" tabs, saves the ID as TEAM_SHEET_ID, and migrates any existing
+// tasks from TASKS_SHEET_ID.  Run once from the Apps Script editor.
+
+function setupTeamSheet() {
+  var props = PropertiesService.getScriptProperties();
+
+  // If already set, report and bail
+  var existing = props.getProperty('TEAM_SHEET_ID');
+  if (existing) {
+    Logger.log('setupTeamSheet: TEAM_SHEET_ID already set → ' +
+      'https://docs.google.com/spreadsheets/d/' + existing);
+    return;
+  }
+
+  // Create the spreadsheet
+  var ss = SpreadsheetApp.create('CPB Team Site Data');
+  var id = ss.getId();
+
+  // ── Team Calendar tab ──
+  var calTab = ss.getActiveSheet().setName('Team Calendar');
+  calTab.getRange(1, 1, 1, 6).setValues([['Date', 'Title', 'Type', 'Owner', 'Notes', 'Source']]);
+  calTab.getRange(1, 1, 1, 6).setFontWeight('bold');
+  calTab.setFrozenRows(1);
+
+  // ── Tasks tab ──
+  var tasksTab = ss.insertSheet('Tasks');
+  tasksTab.getRange(1, 1, 1, 6).setValues([['Task', 'Owner', 'Due Date', 'Priority', 'Status', 'Notes']]);
+  tasksTab.getRange(1, 1, 1, 6).setFontWeight('bold');
+  tasksTab.setFrozenRows(1);
+
+  // Migrate existing tasks if TASKS_SHEET_ID was set
+  var oldTasksId = props.getProperty('TASKS_SHEET_ID');
+  var migratedRows = 0;
+  if (oldTasksId) {
+    try {
+      var oldRows = SpreadsheetApp.openById(oldTasksId).getSheets()[0].getDataRange().getValues();
+      if (oldRows.length > 1) {
+        var dataRows = oldRows.slice(1).filter(function(r) { return String(r[0]).trim(); });
+        if (dataRows.length) {
+          tasksTab.getRange(2, 1, dataRows.length, dataRows[0].length).setValues(dataRows);
+          migratedRows = dataRows.length;
+        }
+      }
+    } catch (ex) {
+      Logger.log('setupTeamSheet: could not migrate tasks — ' + ex);
+    }
+  }
+
+  // Save the new sheet ID and clear the old separate property
+  props.setProperty('TEAM_SHEET_ID', id);
+  if (oldTasksId) props.deleteProperty('TASKS_SHEET_ID');
+
+  var url = 'https://docs.google.com/spreadsheets/d/' + id;
+  Logger.log('setupTeamSheet: created sheet → ' + url);
+  Logger.log('setupTeamSheet: migrated ' + migratedRows + ' task rows from previous sheet.');
+  Logger.log('Next steps: 1) run syncTeamCalendar()  2) color team events Peacock in Google Calendar  3) redeploy the web app.');
+}
+
+
 // ─── Tasks Data ───────────────────────────────────────────────────────────────
-// Reads task rows from the TASKS_SHEET_ID Sheet.
-// Expected columns: Task | Owner | Due Date | Priority | Status | Notes
-// Set TASKS_SHEET_ID in Script Properties to enable.
+// Reads from the "Tasks" tab of TEAM_SHEET_ID (preferred) or the first sheet
+// of TASKS_SHEET_ID (legacy).  Columns: Task | Owner | Due Date | Priority | Status | Notes
 
 function getTasksData() {
   var tasks   = [];
-  var sheetId = PropertiesService.getScriptProperties().getProperty('TASKS_SHEET_ID');
+  var props   = PropertiesService.getScriptProperties();
+  var teamId  = props.getProperty('TEAM_SHEET_ID');
+  var sheetId = teamId || props.getProperty('TASKS_SHEET_ID');
   if (!sheetId) return JSON.stringify(tasks);
   var tz = Session.getScriptTimeZone();
 
   try {
-    var rows = SpreadsheetApp.openById(sheetId).getSheets()[0].getDataRange().getValues();
+    var ss   = SpreadsheetApp.openById(sheetId);
+    var sheet = teamId ? (ss.getSheetByName('Tasks') || ss.getSheets()[0]) : ss.getSheets()[0];
+    var rows  = sheet.getDataRange().getValues();
     if (rows.length < 2) return JSON.stringify(tasks);
 
     var headers   = rows[0].map(function(h) { return String(h).trim().toLowerCase(); });
