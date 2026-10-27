@@ -1076,26 +1076,47 @@ function _brQueriesDeleteTriggersFor(funcName) {
 
 
 // ─── PulseCheck Webhook ───────────────────────────────────────────────────────
-// sendPulseCheckReminder(): manually callable from the Apps Script editor or a
-// time-based trigger. Posts a Google Chat card reminding the team to complete
-// PulseCheck before the Nov 6 deadline.
+// sendDailyPulseCheckNudge(): fires each morning via a time-based trigger and
+// posts a rotating funny reminder to the Planny chat space.
+// Silently exits after the Nov 6 deadline so the trigger can stay installed.
 //
-// Setup: Apps Script editor → Triggers → Add Trigger → sendPulseCheckReminder
-//        → Time-driven → Specific date/time → Nov 5 2026 09:00 PT (as desired).
-// The webhook URL is read from the CHAT_WEBHOOK_URL script property.
+// Setup (run once from the Apps Script editor):
+//   setupDailyPulseCheckTrigger()
+// That installs a daily 9 AM PT trigger automatically.
 
-function sendPulseCheckReminder() {
+var _PC_DEADLINE_UTC = new Date('2026-11-07T08:00:00Z'); // Nov 6 23:59:59 PST
+
+var _PC_NUDGES = [
+  '☕ Good morning, CPB! PulseCheck won\'t complete itself — trust me, we asked it nicely. *Closes Nov 6.* Go click some buttons: https://cpbteamsite.example',
+  '🎯 PulseCheck update: the survey is still sitting there, patiently waiting for you like a golden retriever by the door. *Deadline: Nov 6.* Don\'t leave it hanging!',
+  '📣 Breaking news: local analytics team discovers that feedback forms do not fill themselves out. More at 9. (Also: PulseCheck closes *Nov 6* — do yours today!)',
+  '🤔 Hypothetically, if you HAVEN\'T done PulseCheck yet… this message is for you. Hypothetically. *Closes Friday Nov 6.*',
+  '🚨 URGENT: your couch knows your opinions. Your manager does not. Fix that. PulseCheck closes *Nov 6 at 11:59 PM PST.*',
+  '🦆 One duck completed PulseCheck. That duck has opinions about collaboration tools and is not afraid to share them. Be like the duck. *Closes Nov 6.*',
+  '📊 Fun fact: teams that complete PulseCheck are statistically more likely to receive emails from Derek saying "great participation!" Don\'t miss out. *Nov 6 deadline.*',
+  '⏳ T-minus "not much time" until PulseCheck closes on *Nov 6*. Your feedback literally helps shape how we work — plus it takes like 5 minutes and you can do it in your pajamas.',
+  '🎬 Picture this: it\'s Nov 7. Derek asks for feedback. You say "I meant to do PulseCheck." Avoid this plot twist. *Close Nov 6.* You\'ve got this.',
+  '🏁 Final stretch! PulseCheck closes *tonight (Nov 6) at 11:59 PM PST*. If you\'ve already done it — you absolute legend. If not — now is the time. RIGHT NOW. This message will self-destruct.'
+];
+
+function sendDailyPulseCheckNudge() {
+  var now = new Date();
+  if (now >= _PC_DEADLINE_UTC) {
+    Logger.log('sendDailyPulseCheckNudge: past deadline — skipping.');
+    return;
+  }
+
   var props = PropertiesService.getScriptProperties();
   var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
   if (!url) {
-    Logger.log('sendPulseCheckReminder: no CHAT_WEBHOOK_URL_PLANNY set in Script Properties — skipped.');
+    Logger.log('sendDailyPulseCheckNudge: no CHAT_WEBHOOK_URL_PLANNY — skipped.');
     return;
   }
-  var msg = '📊 *PulseCheck Reminder*\n\n' +
-    'The PulseCheck survey closes *Friday, November 6 at 11:59 PM PST*.\n\n' +
-    'If you haven\'t completed it yet, please do so before the deadline — ' +
-    'your feedback helps shape how we work as a team. 🙏\n\n' +
-    '_This reminder was sent automatically from the CPB Team Site._';
+
+  // Cycle through messages based on day-of-year so each day gets a different one
+  var dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  var msg = _PC_NUDGES[dayOfYear % _PC_NUDGES.length];
+
   try {
     var resp = UrlFetchApp.fetch(url, {
       method: 'post',
@@ -1103,19 +1124,34 @@ function sendPulseCheckReminder() {
       muteHttpExceptions: true,
       payload: JSON.stringify({ text: msg })
     });
-    Logger.log('sendPulseCheckReminder: HTTP ' + resp.getResponseCode());
+    Logger.log('sendDailyPulseCheckNudge: HTTP ' + resp.getResponseCode() + ' — ' + msg.substring(0, 60));
   } catch (e) {
-    Logger.log('sendPulseCheckReminder error: ' + e);
+    Logger.log('sendDailyPulseCheckNudge error: ' + e);
   }
+}
+
+// Run once from the Apps Script editor to install the daily 9 AM trigger.
+function setupDailyPulseCheckTrigger() {
+  // Remove any existing nudge trigger first to avoid duplicates
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendDailyPulseCheckNudge') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('sendDailyPulseCheckNudge')
+    .timeBased()
+    .atHour(9)
+    .everyDays(1)
+    .inTimezone('America/Vancouver')
+    .create();
+  Logger.log('setupDailyPulseCheckTrigger: daily 9 AM PT trigger installed.');
 }
 
 function sendPulseCheckClosed() {
   var props = PropertiesService.getScriptProperties();
   var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
-  if (!url) { Logger.log('sendPulseCheckClosed: no CHAT_WEBHOOK_URL_PLANNY set in Script Properties — skipped.'); return; }
-  var msg = '✅ *PulseCheck Closed*\n\n' +
-    'The PulseCheck survey has now closed. Thank you to everyone who participated!\n\n' +
-    'Results will be shared with the team once they\'re available.';
+  if (!url) { Logger.log('sendPulseCheckClosed: no CHAT_WEBHOOK_URL_PLANNY — skipped.'); return; }
+  var msg = '✅ *PulseCheck is now closed!*\n\n' +
+    'Thanks to everyone who shared their feedback — you\'re the reason we can make CPB a better place to work. 🙌\n\n' +
+    'Results will be shared with the team once they\'re available. In the meantime, treat yourself to a snack. You\'ve earned it.';
   try {
     var resp = UrlFetchApp.fetch(url, {
       method: 'post',
