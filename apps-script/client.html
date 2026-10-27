@@ -1997,8 +1997,40 @@ function initRosterMap() {
         '<p>No team events in the next 90 days. Add rows to the Team Calendar sheet or run syncTeamCalendar().</p></div>';
       return;
     }
+
+    // Compute week boundaries (Monday-based) as yyyy-MM-dd strings
+    function toYMD(d) {
+      var y = d.getFullYear(), m = d.getMonth() + 1, day = d.getDate();
+      return y + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+    }
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var dow = today.getDay();
+    var thisMonday = new Date(today); thisMonday.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
+    var nextMonday = new Date(thisMonday); nextMonday.setDate(thisMonday.getDate() + 7);
+    var twoMonday  = new Date(nextMonday);  twoMonday.setDate(nextMonday.getDate() + 7);
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var thisMondayStr = toYMD(thisMonday);
+    var nextMondayStr = toYMD(nextMonday);
+    var twoMondayStr  = toYMD(twoMonday);
+
+    function groupLabel(dateStr) {
+      if (dateStr < nextMondayStr) return 'This Week';
+      if (dateStr < twoMondayStr)  return 'Next Week';
+      var d = new Date(dateStr + 'T12:00:00');
+      return MONTHS[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    // Bucket events preserving sort order
+    var groupOrder = [], groupBuckets = {};
+    events.forEach(function(e) {
+      var lbl = groupLabel(e.date);
+      if (!groupBuckets[lbl]) { groupBuckets[lbl] = []; groupOrder.push(lbl); }
+      groupBuckets[lbl].push(e);
+    });
+
     var typeCls = { 'team calendar': 'info', meeting: 'info', deadline: 'bad', milestone: 'warn', event: 'ok' };
-    container.innerHTML = events.map(function (e) {
+
+    function cardHtml(e) {
       var t        = (e.type || 'event').toLowerCase();
       var cls      = typeCls[t] || 'ok';
       var lbl      = e.type || 'Event';
@@ -2009,6 +2041,11 @@ function initRosterMap() {
         '<div class="cal-card-datetime">' + dateTime + '</div>' +
         '<div class="cal-card-badge"><span class="pbadge ' + cls + '">' + esc(lbl) + '</span></div>' +
         '</div>';
+    }
+
+    container.innerHTML = groupOrder.map(function(lbl) {
+      return '<div class="cal-group-hd">' + esc(lbl) + '</div>' +
+        '<div class="cal-cards">' + groupBuckets[lbl].map(cardHtml).join('') + '</div>';
     }).join('');
   }
 
