@@ -322,7 +322,7 @@ function getCalendarData() {
   var cacheKey = 'cal_data_v1';
   try {
     var hit = cache.get(cacheKey);
-    if (hit) return hit;
+    if (hit) return JSON.parse(hit);
   } catch (e) {}
 
   var events   = [];
@@ -387,9 +387,9 @@ function getCalendarData() {
   }
 
   events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
-  var result = JSON.stringify({ events: events, calError: calError });
-  try { cache.put(cacheKey, result, 900); } catch (e) {}  // 15-min cache
-  return result;
+  var resultObj = { events: events, calError: calError };
+  try { cache.put(cacheKey, JSON.stringify(resultObj), 900); } catch (e) {}  // 15-min cache
+  return resultObj;
 }
 
 
