@@ -1216,39 +1216,63 @@ function sendAnniversaryNudges() {
     return;
   }
 
-  // "Tomorrow" in Pacific time
-  var tz       = 'America/Vancouver';
-  var now      = new Date();
-  var tomorrow = new Date(now.getTime() + 86400000);
-  var tMonth   = parseInt(Utilities.formatDate(tomorrow, tz, 'M'),  10);
-  var tDay     = parseInt(Utilities.formatDate(tomorrow, tz, 'd'),  10);
-  var tYear    = parseInt(Utilities.formatDate(tomorrow, tz, 'yyyy'), 10);
+  var tz  = 'America/Vancouver';
+  var now = new Date();
+
+  // On Fridays, also cover Saturday (+1), Sunday (+2), and Monday (+3) so
+  // weekend/Monday anniversaries are announced on the last business day before.
+  var todayDow = parseInt(Utilities.formatDate(now, tz, 'u'), 10); // 1=Mon … 7=Sun
+  var lookaheadDays = [1]; // always check tomorrow
+  if (todayDow === 5) lookaheadDays = [1, 2, 3]; // Friday: cover Sat, Sun, Mon
+
+  var monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   var sent = 0;
-  _ANNIVERSARY_MEMBERS.forEach(function(m) {
-    if (m.month !== tMonth || m.day !== tDay) return;
-    var years = tYear - m.startYear;
-    if (years < 1) return; // first day on the job doesn't count
-    var msg =
-      'Good morning Team! 👋\n\n' +
-      '🎉 *Anniversary Alert!*\n\n' +
-      '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* tomorrow and I wanted to let the team know ahead of time.\n\n' +
-      years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' + m.name.split(' ')[0] + '! 🙌';
-    try {
-      var resp = UrlFetchApp.fetch(url, {
-        method: 'post',
-        contentType: 'application/json',
-        muteHttpExceptions: true,
-        payload: JSON.stringify({ text: msg })
-      });
-      Logger.log('sendAnniversaryNudges: sent for ' + m.name + ' (' + years + 'y) — HTTP ' + resp.getResponseCode());
-      sent++;
-    } catch (e) {
-      Logger.log('sendAnniversaryNudges error for ' + m.name + ': ' + e);
-    }
+  lookaheadDays.forEach(function(offset) {
+    var target      = new Date(now.getTime() + offset * 86400000);
+    var tMonth      = parseInt(Utilities.formatDate(target, tz, 'M'),    10);
+    var tDay        = parseInt(Utilities.formatDate(target, tz, 'd'),    10);
+    var tYear       = parseInt(Utilities.formatDate(target, tz, 'yyyy'), 10);
+    var isEarlyNote = offset > 1; // true for Sun (+2) and Mon (+3) on a Friday
+    var targetDow   = parseInt(Utilities.formatDate(target, tz, 'u'),   10);
+
+    _ANNIVERSARY_MEMBERS.forEach(function(m) {
+      if (m.month !== tMonth || m.day !== tDay) return;
+      var years = tYear - m.startYear;
+      if (years < 1) return;
+
+      var dateStr    = monthNames[tMonth - 1] + ' ' + tDay;
+      var whenPhrase = offset === 1 ? 'tomorrow' : 'on ' + dateStr;
+      var earlyNote  = '';
+      if (isEarlyNote) {
+        var dayName = targetDow === 6 ? 'Saturday' : (targetDow === 7 ? 'Sunday' : 'Monday');
+        earlyNote = '\n_(Heads up sent early — their actual anniversary falls on ' + dayName + ', ' + dateStr + '.)_';
+      }
+
+      var msg =
+        'Good morning Team! 👋\n\n' +
+        '🎉 *Anniversary Alert!*\n\n' +
+        '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* ' + whenPhrase +
+        ' and I wanted to let the team know ahead of time.\n\n' +
+        years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' +
+        m.name.split(' ')[0] + '! 🙌' + earlyNote;
+
+      try {
+        var resp = UrlFetchApp.fetch(url, {
+          method: 'post',
+          contentType: 'application/json',
+          muteHttpExceptions: true,
+          payload: JSON.stringify({ text: msg })
+        });
+        Logger.log('sendAnniversaryNudges: sent for ' + m.name + ' (' + years + 'y, +' + offset + 'd) — HTTP ' + resp.getResponseCode());
+        sent++;
+      } catch (e) {
+        Logger.log('sendAnniversaryNudges error for ' + m.name + ': ' + e);
+      }
+    });
   });
 
-  if (sent === 0) Logger.log('sendAnniversaryNudges: no anniversaries tomorrow.');
+  if (sent === 0) Logger.log('sendAnniversaryNudges: no anniversaries to announce today.');
 }
 
 // Run once from the Apps Script editor to install the daily 8 AM PT trigger.
