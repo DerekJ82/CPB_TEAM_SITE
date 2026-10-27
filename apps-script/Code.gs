@@ -1230,11 +1230,10 @@ function sendAnniversaryNudges() {
     var years = tYear - m.startYear;
     if (years < 1) return; // first day on the job doesn't count
     var msg =
+      'Good morning Team! 👋\n\n' +
       '🎉 *Anniversary Alert!*\n\n' +
-      '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* tomorrow, ' +
-      'and I wanted to give the team a heads-up ahead of time.\n\n' +
-      years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' + m.name.split(' ')[0] + '! 🙌\n\n' +
-      '_Brought to you by your friendly neighbourhood CPB Team Bot_ 🤖';
+      '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* tomorrow and I wanted to let the team know ahead of time.\n\n' +
+      years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' + m.name.split(' ')[0] + '! 🙌';
     try {
       var resp = UrlFetchApp.fetch(url, {
         method: 'post',
