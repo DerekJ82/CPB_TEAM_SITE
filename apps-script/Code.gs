@@ -1087,17 +1087,29 @@ function _brQueriesDeleteTriggersFor(funcName) {
 var _PC_DEADLINE_UTC = new Date('2026-11-07T08:00:00Z'); // Nov 6 23:59:59 PST
 
 var _PC_NUDGES = [
-  '☕ Good morning, CPB! PulseCheck won\'t complete itself — trust me, we asked it nicely. *Closes Nov 6.* Go click some buttons: https://cpbteamsite.example',
-  '🎯 PulseCheck update: the survey is still sitting there, patiently waiting for you like a golden retriever by the door. *Deadline: Nov 6.* Don\'t leave it hanging!',
-  '📣 Breaking news: local analytics team discovers that feedback forms do not fill themselves out. More at 9. (Also: PulseCheck closes *Nov 6* — do yours today!)',
-  '🤔 Hypothetically, if you HAVEN\'T done PulseCheck yet… this message is for you. Hypothetically. *Closes Friday Nov 6.*',
-  '🚨 URGENT: your couch knows your opinions. Your manager does not. Fix that. PulseCheck closes *Nov 6 at 11:59 PM PST.*',
-  '🦆 One duck completed PulseCheck. That duck has opinions about collaboration tools and is not afraid to share them. Be like the duck. *Closes Nov 6.*',
-  '📊 Fun fact: teams that complete PulseCheck are statistically more likely to receive emails from Derek saying "great participation!" Don\'t miss out. *Nov 6 deadline.*',
-  '⏳ T-minus "not much time" until PulseCheck closes on *Nov 6*. Your feedback literally helps shape how we work — plus it takes like 5 minutes and you can do it in your pajamas.',
-  '🎬 Picture this: it\'s Nov 7. Derek asks for feedback. You say "I meant to do PulseCheck." Avoid this plot twist. *Close Nov 6.* You\'ve got this.',
-  '🏁 Final stretch! PulseCheck closes *tonight (Nov 6) at 11:59 PM PST*. If you\'ve already done it — you absolute legend. If not — now is the time. RIGHT NOW. This message will self-destruct.'
+  '☕ Good morning, CPB! PulseCheck won\'t complete itself — trust me, we asked it nicely. *{remaining}* Go click some buttons!',
+  '🎯 PulseCheck update: the survey is still sitting there, patiently waiting for you like a golden retriever by the door. *{remaining}* Don\'t leave it hanging!',
+  '📣 Breaking news: local analytics team discovers that feedback forms do not fill themselves out. More at 9. *{remaining}* — do yours today!',
+  '🤔 Hypothetically, if you HAVEN\'T done PulseCheck yet… this message is for you. Hypothetically. *{remaining}*',
+  '🚨 URGENT: your couch knows your opinions. Your manager does not. Fix that. *{remaining}*',
+  '🦆 One duck completed PulseCheck. That duck has opinions about collaboration tools and is not afraid to share them. Be like the duck. *{remaining}*',
+  '📊 Fun fact: teams that complete PulseCheck are statistically more likely to receive emails from Derek saying "great participation!" Don\'t miss out. *{remaining}*',
+  '⏳ Your feedback literally helps shape how we work — plus it takes like 5 minutes and you can do it in your pajamas. *{remaining}*',
+  '🎬 Picture this: it\'s Nov 7. Derek asks for feedback. You say "I meant to do PulseCheck." Avoid this plot twist. *{remaining}* You\'ve got this.',
+  '🏁 Final stretch! If you\'ve already done it — you absolute legend. If not — now is the time. RIGHT NOW. *{remaining}*'
 ];
+
+function _pcTimeRemaining(now) {
+  var diff = _PC_DEADLINE_UTC - now;
+  var days = Math.floor(diff / 86400000);
+  var hrs  = Math.floor((diff % 86400000) / 3600000);
+  var mins = Math.floor((diff % 3600000) / 60000);
+  if (days > 1) return days + ' days, ' + hrs + ' hrs remaining.';
+  if (days === 1) return '1 day, ' + hrs + ' hrs remaining.';
+  if (hrs > 1)  return hrs + ' hrs, ' + mins + ' min remaining.';
+  if (hrs === 1) return '1 hr, ' + mins + ' min remaining.';
+  return mins + ' minutes remaining — GO GO GO!';
+}
 
 function sendDailyPulseCheckNudge() {
   var now = new Date();
@@ -1115,7 +1127,8 @@ function sendDailyPulseCheckNudge() {
 
   // Cycle through messages based on day-of-year so each day gets a different one
   var dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-  var msg = _PC_NUDGES[dayOfYear % _PC_NUDGES.length];
+  var template  = _PC_NUDGES[dayOfYear % _PC_NUDGES.length];
+  var msg       = template.replace('{remaining}', _pcTimeRemaining(now));
 
   try {
     var resp = UrlFetchApp.fetch(url, {
@@ -1124,7 +1137,7 @@ function sendDailyPulseCheckNudge() {
       muteHttpExceptions: true,
       payload: JSON.stringify({ text: msg })
     });
-    Logger.log('sendDailyPulseCheckNudge: HTTP ' + resp.getResponseCode() + ' — ' + msg.substring(0, 60));
+    Logger.log('sendDailyPulseCheckNudge: HTTP ' + resp.getResponseCode() + ' — ' + msg.substring(0, 80));
   } catch (e) {
     Logger.log('sendDailyPulseCheckNudge error: ' + e);
   }
