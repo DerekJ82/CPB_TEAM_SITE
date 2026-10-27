@@ -343,7 +343,7 @@ function getCalendarData() {
           dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
           title:     ev.getTitle(),
           type:      'meeting',
-          owner:     (ev.getCreators()[0] || ''),
+          owner:     ((ev.getCreators() || [])[0] || ''),
           notes:     ev.getDescription() || ''
         });
       });
