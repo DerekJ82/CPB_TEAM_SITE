@@ -2114,4 +2114,46 @@ function initRosterMap() {
   }
 })();
 
+// ─── PulseCheck countdown ────────────────────────────────────────────────────
+(function() {
+  // 2026-11-07 07:59:59 UTC = Nov 6 23:59:59 PST (UTC-8)
+  var DEADLINE = new Date('2026-11-07T07:59:59Z').getTime();
+  var el = {
+    days: document.getElementById('pcDays'),
+    hrs:  document.getElementById('pcHrs'),
+    mins: document.getElementById('pcMins'),
+    secs: document.getElementById('pcSecs'),
+    digits: document.getElementById('pcDigits'),
+    done:   document.getElementById('pcDone'),
+    wrap:   document.getElementById('pcCountdown')
+  };
+  if (!el.days) return;
+
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+  function tick() {
+    var now  = Date.now();
+    var diff = DEADLINE - now;
+    if (diff <= 0) {
+      el.digits.hidden = true;
+      el.done.hidden   = false;
+      return;
+    }
+    var d = Math.floor(diff / 86400000);
+    var h = Math.floor((diff % 86400000) / 3600000);
+    var m = Math.floor((diff % 3600000)  / 60000);
+    var s = Math.floor((diff % 60000)    / 1000);
+    el.days.textContent = pad(d);
+    el.hrs.textContent  = pad(h);
+    el.mins.textContent = pad(m);
+    el.secs.textContent = pad(s);
+    // Turn lime when < 24 hours
+    if (diff < 86400000) el.wrap.classList.add('pc-urgent');
+    else el.wrap.classList.remove('pc-urgent');
+  }
+
+  tick();
+  setInterval(tick, 1000);
+})();
+
 </script>

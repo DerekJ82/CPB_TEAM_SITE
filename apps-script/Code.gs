@@ -1075,6 +1075,63 @@ function _brQueriesDeleteTriggersFor(funcName) {
 }
 
 
+// ─── PulseCheck Webhook ───────────────────────────────────────────────────────
+// sendPulseCheckReminder(): manually callable from the Apps Script editor or a
+// time-based trigger. Posts a Google Chat card reminding the team to complete
+// PulseCheck before the Nov 6 deadline.
+//
+// Setup: Apps Script editor → Triggers → Add Trigger → sendPulseCheckReminder
+//        → Time-driven → Specific date/time → Nov 5 2026 09:00 PT (as desired).
+// The webhook URL is read from the CHAT_WEBHOOK_URL script property.
+
+function sendPulseCheckReminder() {
+  var props = PropertiesService.getScriptProperties();
+  var url   = props.getProperty('CHAT_WEBHOOK_URL') ||
+              props.getProperty('CHAT_WEBHOOK_URL_AUTHY');
+  if (!url) {
+    Logger.log('sendPulseCheckReminder: no CHAT_WEBHOOK_URL set in Script Properties — skipped.');
+    return;
+  }
+  var msg = '📊 *PulseCheck Reminder*\n\n' +
+    'The PulseCheck survey closes *Friday, November 6 at 11:59 PM PST*.\n\n' +
+    'If you haven\'t completed it yet, please do so before the deadline — ' +
+    'your feedback helps shape how we work as a team. 🙏\n\n' +
+    '_This reminder was sent automatically from the CPB Team Site._';
+  try {
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'post',
+      contentType: 'application/json',
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ text: msg })
+    });
+    Logger.log('sendPulseCheckReminder: HTTP ' + resp.getResponseCode());
+  } catch (e) {
+    Logger.log('sendPulseCheckReminder error: ' + e);
+  }
+}
+
+function sendPulseCheckClosed() {
+  var props = PropertiesService.getScriptProperties();
+  var url   = props.getProperty('CHAT_WEBHOOK_URL') ||
+              props.getProperty('CHAT_WEBHOOK_URL_AUTHY');
+  if (!url) { Logger.log('sendPulseCheckClosed: no CHAT_WEBHOOK_URL — skipped.'); return; }
+  var msg = '✅ *PulseCheck Closed*\n\n' +
+    'The PulseCheck survey has now closed. Thank you to everyone who participated!\n\n' +
+    'Results will be shared with the team once they\'re available.';
+  try {
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'post',
+      contentType: 'application/json',
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ text: msg })
+    });
+    Logger.log('sendPulseCheckClosed: HTTP ' + resp.getResponseCode());
+  } catch (e) {
+    Logger.log('sendPulseCheckClosed error: ' + e);
+  }
+}
+
+
 // ─── Admin: Access Control ────────────────────────────────────────────────────
 // Checks whether the current user is in the EPB Hub admin list.
 // Used by doGet to gate the admin panel in the Team Site UI.

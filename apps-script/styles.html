@@ -671,4 +671,33 @@ a{color:var(--purple)}
 .cal-card-empty p,.cal-card-error p{font-size:13px;color:var(--grey);margin:0}
 @media(max-width:600px){.cal-cards{grid-template-columns:1fr}}
 
+/* ─── PulseCheck Countdown ─────────────────────────────────────────────────── */
+.pc-countdown{text-align:center;margin-bottom:clamp(28px,3.5vw,44px);
+  padding:clamp(20px,2.5vw,30px) clamp(24px,4vw,48px);
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;display:inline-block}
+.pc-label{font-family:var(--micro);font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);
+  margin-bottom:14px}
+.pc-digits{display:flex;align-items:center;gap:clamp(6px,1.2vw,14px);
+  justify-content:center}
+.pc-unit{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pc-num{font-family:var(--disp);font-weight:900;
+  font-size:clamp(36px,5.5vw,72px);line-height:1;letter-spacing:-.04em;
+  color:#fff;font-variant-numeric:tabular-nums;min-width:2ch;text-align:center}
+.pc-cap{font-family:var(--micro);font-size:9px;font-weight:500;
+  letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.pc-sep{font-family:var(--disp);font-weight:900;
+  font-size:clamp(28px,4vw,56px);line-height:1;color:var(--lime);
+  margin-bottom:18px;align-self:flex-start;padding-top:4px}
+.pc-sub{font-family:var(--text);font-size:clamp(11px,1vw,13px);
+  color:rgba(255,255,255,.4);margin-top:14px;letter-spacing:.02em}
+.pc-done{font-family:var(--disp);font-weight:700;font-size:clamp(16px,1.8vw,22px);
+  color:var(--lime);margin-top:10px;letter-spacing:-.01em}
+.pc-urgent .pc-num{color:var(--lime)}
+@media(max-width:560px){
+  .pc-sep{font-size:24px;margin-bottom:14px}
+  .pc-countdown{padding:18px 20px}
+}
+
 </style>
