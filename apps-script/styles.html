@@ -648,4 +648,22 @@ a{color:var(--purple)}
 .roster-map-split .leaflet-container,
 .roster-map-split .leaflet-grab{cursor:default!important}
 
+/* ─── Calendar Cards ──────────────────────────────────────────────────────── */
+.cal-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:clamp(14px,2vw,22px)}
+.cal-card{background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:clamp(18px,2.2vw,26px);box-shadow:0 1px 4px rgba(0,0,0,.07);
+  transition:box-shadow .2s,transform .2s,border-color .2s}
+.cal-card:hover{box-shadow:0 5px 16px rgba(0,0,0,.11);transform:translateY(-2px);border-color:var(--purple)}
+.cal-card-title{font-family:var(--disp);font-weight:900;font-size:clamp(16px,1.8vw,20px);
+  line-height:1.25;letter-spacing:-.02em;color:var(--purple);margin:0 0 8px}
+.cal-card-datetime{font-size:clamp(12px,1vw,13px);color:var(--grey);margin-bottom:12px;line-height:1.4}
+.cal-card-badge{}
+.cal-card-loading,.cal-card-empty,.cal-card-error{
+  padding:clamp(32px,6vw,52px) var(--gut);text-align:center;border-radius:12px;
+  border:1px solid var(--line)}
+.cal-card-loading .eyebrow,.cal-card-empty .eyebrow,.cal-card-error .eyebrow{display:block;margin-bottom:6px}
+.cal-card-empty,.cal-card-error{background:rgba(75,40,109,.03)}
+.cal-card-empty p,.cal-card-error p{font-size:13px;color:var(--grey);margin:0}
+@media(max-width:600px){.cal-cards{grid-template-columns:1fr}}
+
 </style>

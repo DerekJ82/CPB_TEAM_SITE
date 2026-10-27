@@ -1981,33 +1981,34 @@ function initRosterMap() {
   }
 
   function renderCalendar() {
-    var body = document.getElementById('cal-events-body');
-    if (!body) return;
+    var container = document.getElementById('cal-events-container');
+    if (!container) return;
     var raw      = window.CALENDAR_DATA;
     var events   = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.events) ? raw.events : []);
     var calError = raw && raw.calError ? raw.calError : null;
 
     if (calError) {
-      body.innerHTML = '<tr><td colspan="5" class="pipe-error">Calendar access error: ' + esc(calError) +
-        ' — re-authorize the web app in Apps Script (Deploy &rarr; Manage deployments) to grant Calendar access.</td></tr>';
+      container.innerHTML = '<div class="cal-card-error"><span class="eyebrow">Calendar access error</span>' +
+        '<p>' + esc(calError) + ' — re-authorize the web app in Apps Script (Deploy &rarr; Manage deployments).</p></div>';
       return;
     }
     if (!events.length) {
-      body.innerHTML = '<tr><td colspan="5" class="pipe-empty">No upcoming events in the next 90 days.</td></tr>';
+      container.innerHTML = '<div class="cal-card-empty"><span class="eyebrow">No upcoming events</span>' +
+        '<p>No team events in the next 90 days. Add rows to the Team Calendar sheet or run syncTeamCalendar().</p></div>';
       return;
     }
-    var typeCls = { meeting: 'info', deadline: 'bad', milestone: 'warn', event: 'ok' };
-    body.innerHTML = events.map(function (e) {
-      var t   = (e.type || 'event').toLowerCase();
-      var cls = typeCls[t] || 'ok';
-      var lbl = t.charAt(0).toUpperCase() + t.slice(1);
-      return '<tr>' +
-        '<td>' + esc(e.dateLabel || e.date || '') + '</td>' +
-        '<td>' + esc(e.title || '') + '</td>' +
-        '<td><span class="pbadge ' + cls + '">' + esc(lbl) + '</span></td>' +
-        '<td>' + esc(e.owner || '') + '</td>' +
-        '<td class="gt-prose">' + esc(e.notes || '') + '</td>' +
-        '</tr>';
+    var typeCls = { 'team calendar': 'info', meeting: 'info', deadline: 'bad', milestone: 'warn', event: 'ok' };
+    container.innerHTML = events.map(function (e) {
+      var t        = (e.type || 'event').toLowerCase();
+      var cls      = typeCls[t] || 'ok';
+      var lbl      = e.type || 'Event';
+      var dateTime = esc(e.dateLabel || e.date || '');
+      if (e.time) dateTime += ' &middot; ' + esc(e.time) + ' PST';
+      return '<div class="cal-card">' +
+        '<h4 class="cal-card-title">' + esc(e.title || '') + '</h4>' +
+        '<div class="cal-card-datetime">' + dateTime + '</div>' +
+        '<div class="cal-card-badge"><span class="pbadge ' + cls + '">' + esc(lbl) + '</span></div>' +
+        '</div>';
     }).join('');
   }
 
