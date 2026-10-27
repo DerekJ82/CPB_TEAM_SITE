@@ -319,7 +319,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v4';
+  var cacheKey = 'cal_data_v5';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -332,12 +332,15 @@ function getCalendarData() {
   var tz     = Session.getScriptTimeZone();
 
   try {
-    var teamCals = CalendarApp.getCalendarsByName('Team Calendar');
-    if (!teamCals || teamCals.length === 0) {
-      calError = 'Calendar "Team Calendar" not found — check that it is shared with this account.';
+    var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
+    if (!cal) {
+      calError = 'Calendar derek.johnson@telus.com not found — check authorization.';
     } else {
-      teamCals.forEach(function(cal) {
-        cal.getEvents(now, end).forEach(function(ev) {
+      var colorCounts = {};
+      cal.getEvents(now, end).forEach(function(ev) {
+        var c = ev.getColor() || '(none)';
+        colorCounts[c] = (colorCounts[c] || 0) + 1;
+        if (c === '9' || c === '8' || c === '7') {
           var start = ev.getStartTime();
           events.push({
             date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
@@ -347,9 +350,10 @@ function getCalendarData() {
             owner:     ((ev.getCreators() || [])[0] || ''),
             notes:     (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim()
           });
-        });
+        }
       });
-      Logger.log('Calendar loaded: ' + events.length + ' team events from Team Calendar');
+      Logger.log('Color distribution: ' + JSON.stringify(colorCounts));
+      Logger.log('Calendar loaded: ' + events.length + ' team events (colors 7/8/9) from derek.johnson@telus.com');
     }
   } catch (ex) {
     Logger.log('CalendarApp error: ' + ex);
