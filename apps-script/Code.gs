@@ -18,7 +18,7 @@ function doGet(e) {
   tmpl.execUrl = ScriptApp.getService().getUrl();
   tmpl.teamCardData = PropertiesService.getScriptProperties().getProperty('TEAM_CARD_DATA') || '{}';
   tmpl.petCardData  = PropertiesService.getScriptProperties().getProperty('PET_CARD_DATA')  || '{}';
-  tmpl.calendarData  = JSON.stringify(getCalendarData());
+  tmpl.calendarData  = JSON.stringify(getCalendarData()).replace(/<\/script/gi, '<\\/script');
   tmpl.tasksData     = getTasksData();
   var _tasksId = PropertiesService.getScriptProperties().getProperty('TASKS_SHEET_ID');
   tmpl.tasksSheetUrl = _tasksId ? 'https://docs.google.com/spreadsheets/d/' + _tasksId : '';
@@ -319,7 +319,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v1';
+  var cacheKey = 'cal_data_v2';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -344,7 +344,7 @@ function getCalendarData() {
           title:     ev.getTitle(),
           type:      'meeting',
           owner:     ((ev.getCreators() || [])[0] || ''),
-          notes:     ev.getDescription() || ''
+          notes:     (ev.getDescription() || '').replace(/<[^>]*>/g, '').trim()
         });
       });
       Logger.log('Calendar loaded: ' + events.length + ' events from derek.johnson@telus.com');
