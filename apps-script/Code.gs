@@ -318,6 +318,13 @@ function syncTeamData() {
 // Set CALENDAR_EVENTS_SHEET_ID in Script Properties to enable the Sheet source.
 
 function getCalendarData() {
+  var cache    = CacheService.getScriptCache();
+  var cacheKey = 'cal_data_v1';
+  try {
+    var hit = cache.get(cacheKey);
+    if (hit) return hit;
+  } catch (e) {}
+
   var events   = [];
   var calError = null;
   var now    = new Date();
@@ -325,17 +332,23 @@ function getCalendarData() {
   var tz     = Session.getScriptTimeZone();
 
   try {
-    CalendarApp.getDefaultCalendar().getEvents(now, end).forEach(function(ev) {
-      var start = ev.getStartTime();
-      events.push({
-        date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
-        dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
-        title:     ev.getTitle(),
-        type:      'meeting',
-        owner:     '',
-        notes:     ev.getDescription() || ''
+    var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
+    if (!cal) {
+      calError = 'Calendar derek.johnson@telus.com not found — check authorization.';
+    } else {
+      cal.getEvents(now, end).forEach(function(ev) {
+        var start = ev.getStartTime();
+        events.push({
+          date:      Utilities.formatDate(start, tz, 'yyyy-MM-dd'),
+          dateLabel: Utilities.formatDate(start, tz, 'MMM d'),
+          title:     ev.getTitle(),
+          type:      'meeting',
+          owner:     ev.getOrganizer() || '',
+          notes:     ev.getDescription() || ''
+        });
       });
-    });
+      Logger.log('Calendar loaded: ' + events.length + ' events from derek.johnson@telus.com');
+    }
   } catch (ex) {
     Logger.log('CalendarApp error: ' + ex);
     calError = String(ex);
@@ -374,7 +387,9 @@ function getCalendarData() {
   }
 
   events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
-  return JSON.stringify({ events: events, calError: calError });
+  var result = JSON.stringify({ events: events, calError: calError });
+  try { cache.put(cacheKey, result, 900); } catch (e) {}  // 15-min cache
+  return result;
 }
 
 
