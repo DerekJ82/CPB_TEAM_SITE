@@ -1086,10 +1086,9 @@ function _brQueriesDeleteTriggersFor(funcName) {
 
 function sendPulseCheckReminder() {
   var props = PropertiesService.getScriptProperties();
-  var url   = props.getProperty('CHAT_WEBHOOK_URL') ||
-              props.getProperty('CHAT_WEBHOOK_URL_AUTHY');
+  var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
   if (!url) {
-    Logger.log('sendPulseCheckReminder: no CHAT_WEBHOOK_URL set in Script Properties — skipped.');
+    Logger.log('sendPulseCheckReminder: no CHAT_WEBHOOK_URL_PLANNY set in Script Properties — skipped.');
     return;
   }
   var msg = '📊 *PulseCheck Reminder*\n\n' +
@@ -1112,9 +1111,8 @@ function sendPulseCheckReminder() {
 
 function sendPulseCheckClosed() {
   var props = PropertiesService.getScriptProperties();
-  var url   = props.getProperty('CHAT_WEBHOOK_URL') ||
-              props.getProperty('CHAT_WEBHOOK_URL_AUTHY');
-  if (!url) { Logger.log('sendPulseCheckClosed: no CHAT_WEBHOOK_URL — skipped.'); return; }
+  var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
+  if (!url) { Logger.log('sendPulseCheckClosed: no CHAT_WEBHOOK_URL_PLANNY set in Script Properties — skipped.'); return; }
   var msg = '✅ *PulseCheck Closed*\n\n' +
     'The PulseCheck survey has now closed. Thank you to everyone who participated!\n\n' +
     'Results will be shared with the team once they\'re available.';
