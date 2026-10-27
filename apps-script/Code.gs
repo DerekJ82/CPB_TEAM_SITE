@@ -1179,6 +1179,94 @@ function sendPulseCheckClosed() {
 }
 
 
+// ─── Service Anniversary Notifications ───────────────────────────────────────
+// sendAnniversaryNudges(): runs daily at 8 AM PST. Checks if any team member's
+// TELUS service anniversary is tomorrow; if so, posts a celebration message to
+// the Planny chat space via CHAT_WEBHOOK_URL_PLANNY.
+//
+// Setup (run once): setupAnniversaryTrigger()
+
+var _ANNIVERSARY_MEMBERS = [
+  { name: 'Windy Wijaya',          month: 6,  day: 10, startYear: 2019 },
+  { name: 'Sapna Datta',           month: 4,  day: 16, startYear: 2012 },
+  { name: 'Jonathan Lum',          month: 1,  day: 29, startYear: 2024 },
+  { name: 'Arleen Kyle Fernandez', month: 5,  day: 19, startYear: 2025 },
+  { name: 'Malcolm Pilgrim',       month: 3,  day: 30, startYear: 2020 },
+  { name: 'Simrit Singh',          month: 12, day: 10, startYear: 2020 },
+  { name: 'Kevin Mao',             month: 7,  day: 13, startYear: 2026 },
+  { name: 'Jonathan Hu',           month: 1,  day: 24, startYear: 2022 },
+  { name: 'Kyle Sakaguchi',        month: 6,  day: 7,  startYear: 2021 },
+  { name: 'Tyler Makhuza',         month: 4,  day: 11, startYear: 2022 },
+  { name: 'Angie Panah',           month: 8,  day: 26, startYear: 2019 },
+  { name: 'Cindy Ma',              month: 9,  day: 19, startYear: 2022 },
+  { name: 'Kaitlyne MacPherson',   month: 10, day: 31, startYear: 2022 }
+];
+
+function _ordinal(n) {
+  var s = ['th','st','nd','rd'];
+  var v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
+function sendAnniversaryNudges() {
+  var props = PropertiesService.getScriptProperties();
+  var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
+  if (!url) {
+    Logger.log('sendAnniversaryNudges: no CHAT_WEBHOOK_URL_PLANNY — skipped.');
+    return;
+  }
+
+  // "Tomorrow" in Pacific time
+  var tz       = 'America/Vancouver';
+  var now      = new Date();
+  var tomorrow = new Date(now.getTime() + 86400000);
+  var tMonth   = parseInt(Utilities.formatDate(tomorrow, tz, 'M'),  10);
+  var tDay     = parseInt(Utilities.formatDate(tomorrow, tz, 'd'),  10);
+  var tYear    = parseInt(Utilities.formatDate(tomorrow, tz, 'yyyy'), 10);
+
+  var sent = 0;
+  _ANNIVERSARY_MEMBERS.forEach(function(m) {
+    if (m.month !== tMonth || m.day !== tDay) return;
+    var years = tYear - m.startYear;
+    if (years < 1) return; // first day on the job doesn't count
+    var msg =
+      '🎉 *Anniversary Alert!*\n\n' +
+      '@' + m.name + ' is celebrating their *' + _ordinal(years) + ' TELUS Work Anniversary* tomorrow, ' +
+      'and I wanted to give the team a heads-up ahead of time.\n\n' +
+      years + ' year' + (years !== 1 ? 's' : '') + ' — what an incredible milestone. Well done, ' + m.name.split(' ')[0] + '! 🙌\n\n' +
+      '_Brought to you by your friendly neighbourhood CPB Team Bot_ 🤖';
+    try {
+      var resp = UrlFetchApp.fetch(url, {
+        method: 'post',
+        contentType: 'application/json',
+        muteHttpExceptions: true,
+        payload: JSON.stringify({ text: msg })
+      });
+      Logger.log('sendAnniversaryNudges: sent for ' + m.name + ' (' + years + 'y) — HTTP ' + resp.getResponseCode());
+      sent++;
+    } catch (e) {
+      Logger.log('sendAnniversaryNudges error for ' + m.name + ': ' + e);
+    }
+  });
+
+  if (sent === 0) Logger.log('sendAnniversaryNudges: no anniversaries tomorrow.');
+}
+
+// Run once from the Apps Script editor to install the daily 8 AM PT trigger.
+function setupAnniversaryTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendAnniversaryNudges') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('sendAnniversaryNudges')
+    .timeBased()
+    .atHour(8)
+    .everyDays(1)
+    .inTimezone('America/Vancouver')
+    .create();
+  Logger.log('setupAnniversaryTrigger: daily 8 AM PT trigger installed for anniversary notifications.');
+}
+
+
 // ─── Admin: Access Control ────────────────────────────────────────────────────
 // Checks whether the current user is in the EPB Hub admin list.
 // Used by doGet to gate the admin panel in the Team Site UI.
