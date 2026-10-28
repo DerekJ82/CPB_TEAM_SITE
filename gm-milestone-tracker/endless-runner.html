@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>CPB Endless Runner</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- Retro arcade HUD (hidden on start screen via JS) -->
+  <div id="hud">
+    <div class="hud-stat">
+      <span class="hud-label">TARGET</span>
+      <span class="hud-val cyan">646,349</span>
+    </div>
+    <div class="hud-divider"></div>
+    <div class="hud-stat">
+      <span class="hud-label">GM</span>
+      <span id="scoreGM" class="hud-val blue">0</span>
+    </div>
+    <div class="hud-divider"></div>
+    <div class="hud-stat">
+      <span class="hud-label">KDDI</span>
+      <span id="scoreKDDI" class="hud-val green">0</span>
+    </div>
+    <div class="hud-divider"></div>
+    <div class="hud-stat">
+      <span class="hud-label">TOTAL</span>
+      <span id="scoreTotal" class="hud-val gold">0</span>
+    </div>
+  </div>
+
+  <!-- Mute button -->
+  <button id="muteBtn" title="Toggle Mute">🔊</button>
+
+  <!-- Touch overlay — visible only on touch devices, catches taps for jump -->
+  <div id="tapOverlay" aria-label="Tap to jump"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>
