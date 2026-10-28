@@ -334,10 +334,14 @@
   }
 
   /* --- Tab observer ------------------------------------------------------- */
+  // Fires fn() the first time the element becomes visible (hidden → false).
+  // Also fires immediately if the element is already visible at call time —
+  // handles the case where a #hash in the URL shows the tab before this IIFE runs.
   function observeTab(id, fn) {
     var el = document.getElementById(id);
     if (!el) return;
     var done = false;
+    if (!el.hidden) { done = true; fn(); return; }
     new MutationObserver(function () {
       if (!el.hidden && !done) { done = true; fn(); }
     }).observe(el, { attributes: true, attributeFilter: ['hidden'] });
@@ -358,7 +362,18 @@
         _pipeData    = d;
         _pipeLoading = false;
         var cbs = _pipeCbs.slice(); _pipeCbs = [];
-        cbs.forEach(function (fn) { fn(d); });
+        // Wrap in rAF so the newly-visible tab has been laid out before we render.
+        // Also catches any client-side JS error in the render callback.
+        requestAnimationFrame(function () {
+          cbs.forEach(function (fn) {
+            try { fn(d); }
+            catch (e) {
+              console.error('[pipeline] render error:', e);
+              var body = document.getElementById('queries-body');
+              if (body) body.innerHTML = '<p class="pipe-error">Render error — see console: ' + String(e) + '</p>';
+            }
+          });
+        });
       })
       .withFailureHandler(function (e) {
         _pipeLoading = false;
@@ -380,9 +395,11 @@
     var el = document.getElementById('queries-body');
     if (!el) return;
 
+    // Use native querySelectorAll to avoid any cross-IIFE scope dependency on $$.
     function setHtml(html) {
       el.innerHTML = html;
-      $$('.reveal', el).forEach(function(r) { r.classList.add('in'); });
+      Array.prototype.slice.call(el.querySelectorAll('.reveal'))
+        .forEach(function(r) { r.classList.add('in'); });
     }
 
     if (data._error) { setHtml('<p class="pipe-error">' + _esc(data._error) + '</p>'); return; }
