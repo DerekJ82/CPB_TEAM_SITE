@@ -1,0 +1,521 @@
+/* ─── Reset & Variables ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:  #00ff88;
+  --cyan:   #00e5ff;
+  --yellow: #ffe600;
+  --red:    #ff2244;
+  --bg:     #050810;
+  --panel:  #0b1220;
+  --border: rgba(0, 229, 255, 0.22);
+  --mono:   'Courier New', Courier, monospace;
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--cyan);
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ─── Start Screen ─────────────────────────────────────────────────────────── */
+#start-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.45s;
+}
+#start-overlay.hidden { display: none; }
+
+#start-card {
+  width: min(560px, 92vw);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 36px 40px 32px;
+  text-align: center;
+  box-shadow: 0 0 60px rgba(0,229,255,0.12);
+}
+
+#start-logo {
+  font-size: clamp(24px, 6vw, 36px);
+  font-weight: bold;
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan), 0 0 40px rgba(0,229,255,0.4);
+  letter-spacing: 0.18em;
+  margin-bottom: 6px;
+}
+
+#start-sub {
+  font-size: clamp(9px, 2vw, 11px);
+  color: rgba(0,229,255,0.5);
+  letter-spacing: 0.15em;
+  margin-bottom: 22px;
+}
+
+#start-rule {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 22px;
+}
+
+#start-instructions {
+  font-size: clamp(10px, 2.2vw, 12px);
+  color: rgba(255,255,255,0.6);
+  line-height: 1.8;
+  margin-bottom: 24px;
+  text-align: left;
+}
+#start-instructions p { margin-bottom: 6px; }
+#start-instructions strong { color: var(--cyan); }
+
+#key-legend {
+  margin-top: 14px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.key {
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.25);
+  padding: 3px 8px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+}
+
+#start-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: rgba(0,229,255,0.1);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  text-shadow: 0 0 8px var(--cyan);
+  box-shadow: 0 0 20px rgba(0,229,255,0.15);
+  transition: background 0.2s, box-shadow 0.2s;
+  margin-bottom: 14px;
+}
+#start-btn:hover {
+  background: rgba(0,229,255,0.2);
+  box-shadow: 0 0 30px rgba(0,229,255,0.3);
+}
+
+#start-footer {
+  font-size: 10px;
+  color: rgba(0,229,255,0.3);
+  letter-spacing: 0.15em;
+}
+
+/* ─── Game Wrapper ─────────────────────────────────────────────────────────── */
+#game-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 624px;
+  border: 1px solid var(--border);
+  box-shadow: 0 0 40px rgba(0,229,255,0.12);
+}
+
+/* ─── HUD ──────────────────────────────────────────────────────────────────── */
+#hud {
+  background: #1c1c1c;
+  border-bottom: 3px solid #ffffff;
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  user-select: none;
+}
+
+#hud-level {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-shrink: 0;
+}
+#level-val {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: none;
+}
+#period-val {
+  font-size: 10px;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.1em;
+}
+
+#hud-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  justify-content: center;
+}
+.hud-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.hud-sep {
+  color: rgba(255,255,255,0.25);
+  font-size: 18px;
+}
+
+.hud-lbl {
+  font-size: 8px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.15em;
+}
+#target-val, #total-val {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--yellow);
+  letter-spacing: 0.05em;
+}
+#total-val { color: #88ff88; }
+
+#hud-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+#lives-val {
+  font-size: 11px;
+  color: #ff4444;
+  text-shadow: none;
+  letter-spacing: 0.1em;
+}
+
+#mute-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 3px 8px;
+  font-family: var(--mono);
+  transition: opacity 0.2s;
+}
+#mute-btn.muted { opacity: 0.35; }
+#mute-btn:hover { background: rgba(255,255,255,0.14); }
+
+/* ─── Canvas Wrap (relative for overlays) ──────────────────────────────────── */
+#canvas-wrap {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+  overflow: hidden;
+}
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+/* ─── Shared Screen-Layer (all overlays) ──────────────────────────────────── */
+.screen-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(3, 7, 20, 0.86);
+  transition: opacity 0.3s;
+}
+.screen-layer.hidden { display: none; }
+
+/* ─── Pause Overlay ────────────────────────────────────────────────────────── */
+#pause-card {
+  text-align: center;
+}
+#pause-header {
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: bold;
+  color: var(--cyan);
+  text-shadow: 0 0 20px var(--cyan);
+  letter-spacing: 0.3em;
+  margin-bottom: 10px;
+  animation: pause-pulse 1.2s ease-in-out infinite;
+}
+@keyframes pause-pulse { 50% { opacity: 0.5; } }
+#pause-sub {
+  font-size: 11px;
+  color: rgba(0,229,255,0.45);
+  letter-spacing: 0.18em;
+}
+
+/* ─── Milestone Popup ──────────────────────────────────────────────────────── */
+#milestone-card {
+  width: min(420px, 88%);
+  border: 2px solid var(--cyan);
+  background: rgba(4, 10, 28, 0.97);
+  padding: 26px 30px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--mono);
+  letter-spacing: 0.07em;
+}
+/* Scan lines */
+#milestone-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.14) 3px, rgba(0,0,0,0.14) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+#milestone-card > * { position: relative; z-index: 1; }
+
+#ms-header {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  margin-bottom: 10px;
+  animation: ms-blink 1.1s step-end infinite;
+}
+@keyframes ms-blink { 50% { opacity: 0.45; } }
+
+#ms-period {
+  font-size: clamp(28px, 8vw, 42px);
+  font-weight: bold;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+#ms-batch {
+  font-size: 10px;
+  margin-bottom: 16px;
+}
+
+.ms-rule {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 12px 0;
+}
+.ms-lbl {
+  font-size: 8px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.2em;
+  margin-bottom: 3px;
+}
+
+#ms-delivered-val {
+  font-size: clamp(20px, 6vw, 28px);
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+#ms-penalty {
+  font-size: 10px;
+  margin-bottom: 2px;
+  letter-spacing: 0.1em;
+}
+
+#ms-total-val {
+  font-size: clamp(16px, 4vw, 20px);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#ms-bar-wrap {
+  width: 100%;
+  height: 7px;
+  background: rgba(255,255,255,0.07);
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+#ms-bar-fill {
+  height: 100%;
+  width: 0;
+  transition: width 0.9s ease;
+}
+#ms-pct {
+  font-size: 9px;
+  margin-bottom: 14px;
+}
+#ms-next {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+/* ─── Victory Screen ───────────────────────────────────────────────────────── */
+#victory-card {
+  width: min(440px, 88%);
+  border: 2px solid #ff44aa;
+  background: rgba(4, 10, 28, 0.97);
+  padding: 30px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--mono);
+  box-shadow: 0 0 60px rgba(255,68,170,0.35), 0 0 120px rgba(255,68,170,0.15);
+}
+#victory-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none;
+}
+#victory-card > * { position: relative; }
+
+#victory-header {
+  font-size: clamp(14px, 4vw, 18px);
+  font-weight: bold;
+  color: #ff44aa;
+  text-shadow: 0 0 20px #ff44aa, 0 0 40px rgba(255,68,170,0.5);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+  animation: ms-blink 1.4s step-end infinite;
+}
+#victory-sub {
+  font-size: 10px;
+  color: rgba(255,68,170,0.55);
+  letter-spacing: 0.18em;
+  margin-bottom: 14px;
+}
+#victory-total {
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: bold;
+  color: #ff44aa;
+  text-shadow: 0 0 20px #ff44aa;
+  margin-bottom: 4px;
+}
+#victory-max {
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 12px;
+}
+#v-bar-wrap {
+  width: 100%;
+  height: 7px;
+  background: rgba(255,255,255,0.07);
+  margin-bottom: 5px;
+  overflow: hidden;
+}
+#v-bar-fill { height: 100%; width: 0; transition: width 0.9s ease; }
+#victory-pct {
+  font-size: 9px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 20px;
+  letter-spacing: 0.15em;
+}
+#play-again-btn {
+  padding: 12px 32px;
+  background: rgba(255,68,170,0.12);
+  border: 1px solid #ff44aa;
+  color: #ff44aa;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  cursor: pointer;
+  text-shadow: 0 0 8px #ff44aa;
+  transition: background 0.2s;
+}
+#play-again-btn:hover { background: rgba(255,68,170,0.25); }
+
+/* ─── D-Pad ────────────────────────────────────────────────────────────────── */
+#dpad {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: grid;
+  grid-template-areas: ". u ." "l . r" ". d .";
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  gap: 3px;
+  opacity: 0.18;
+  touch-action: none;
+  user-select: none;
+}
+/* Show prominently on touch devices */
+@media (hover: none) { #dpad { opacity: 0.65; } }
+
+#dpad-up    { grid-area: u; }
+#dpad-left  { grid-area: l; }
+#dpad-right { grid-area: r; }
+#dpad-down  { grid-area: d; }
+
+.dpad-btn {
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.3);
+  color: var(--cyan);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.dpad-btn:active { background: rgba(0,229,255,0.28); }
+
+/* ─── Status Bar ───────────────────────────────────────────────────────────── */
+#status-bar {
+  background: #1c1c1c;
+  border-top: 3px solid #ffffff;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  user-select: none;
+}
+#status-msg {
+  color: #88ff88;
+  text-shadow: none;
+  transition: color 0.25s;
+}
+#status-msg.secured {
+  color: #ffffff;
+  text-shadow: none;
+}
+#status-msg.error {
+  color: #ff4444;
+  text-shadow: none;
+}
+#controls-hint {
+  color: rgba(255,255,255,0.3);
+  font-size: 9px;
+}
+
+/* ─── Mobile Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  body { justify-content: flex-start; }
+  #game-wrapper { max-width: 100%; border-left: none; border-right: none; }
+  #hud-center { gap: 6px; }
+  .hud-sep { display: none; }
+  #controls-hint { display: none; }
+}
+
+@media (max-height: 700px) and (orientation: landscape) {
+  #start-card { padding: 18px 28px; }
+  #start-instructions { font-size: 10px; line-height: 1.5; }
+}

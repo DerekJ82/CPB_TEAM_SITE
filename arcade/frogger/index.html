@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Data Courier — Connection Milestone Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ─── Start Screen ────────────────────────────────────────────────────── -->
+  <div id="start-overlay">
+    <div id="start-card">
+      <div id="start-logo">DATA COURIER</div>
+      <div id="start-sub">GM &amp; KDDI CONNECTION MILESTONE TRACKER</div>
+      <div id="start-rule"></div>
+      <div id="start-instructions">
+        <p>You are a <strong>Data Courier</strong> carrying connection batches to the Secure Server.</p>
+        <p>Dodge <strong>oncoming traffic</strong> crossing your path.</p>
+        <p>Each hit costs <strong>15,000 connections</strong> from your current batch.</p>
+        <p>Deliver all 5 milestone batches to track the full GM / KDDI deployment.</p>
+        <div id="key-legend">
+          <span class="key">↑ W</span>
+          <span class="key">↓ S</span>
+          <span class="key">← A</span>
+          <span class="key">→ D</span>
+          <span class="key">ESC = PAUSE</span>
+        </div>
+      </div>
+      <button id="start-btn">▶&nbsp; INITIALIZE TRANSMISSION</button>
+      <div id="start-footer">TARGET: 646,000 CONNECTIONS TOTAL</div>
+    </div>
+  </div>
+
+  <!-- ─── Main Game ────────────────────────────────────────────────────────── -->
+  <div id="game-wrapper">
+
+    <!-- HUD -->
+    <header id="hud">
+      <div id="hud-level">
+        <span class="hud-lbl">LEVEL</span>
+        <span id="level-val">1</span>
+        <span id="period-val">2024</span>
+      </div>
+      <div id="hud-center">
+        <div class="hud-col">
+          <span class="hud-lbl">BATCH TARGET</span>
+          <span id="target-val">25,000</span>
+        </div>
+        <div class="hud-sep">|</div>
+        <div class="hud-col">
+          <span class="hud-lbl">TOTAL SECURED</span>
+          <span id="total-val">0</span>
+        </div>
+      </div>
+      <div id="hud-right">
+        <span id="lives-val">♥ ♥ ♥</span>
+        <button id="mute-btn" title="Toggle sound">♪</button>
+      </div>
+    </header>
+
+    <!-- Canvas + all in-game overlays -->
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Pause -->
+      <div id="pause-overlay" class="screen-layer hidden">
+        <div id="pause-card">
+          <div id="pause-header">▌▌&nbsp;PAUSED</div>
+          <div id="pause-sub">PRESS ESC TO RESUME</div>
+        </div>
+      </div>
+
+      <!-- Milestone popup -->
+      <div id="milestone-overlay" class="screen-layer hidden">
+        <div id="milestone-card">
+          <div id="ms-header">[ CONNECTION SECURED ]</div>
+          <div id="ms-period">——</div>
+          <div id="ms-batch">——</div>
+          <div class="ms-rule"></div>
+          <div class="ms-lbl">CONNECTIONS DELIVERED</div>
+          <div id="ms-delivered-val">0</div>
+          <div id="ms-penalty"></div>
+          <div class="ms-rule"></div>
+          <div class="ms-lbl">GRAND TOTAL SECURED</div>
+          <div id="ms-total-val">0</div>
+          <div id="ms-bar-wrap"><div id="ms-bar-fill"></div></div>
+          <div id="ms-pct">0%</div>
+          <div id="ms-next">——</div>
+        </div>
+      </div>
+
+      <!-- Victory screen -->
+      <div id="victory-overlay" class="screen-layer hidden">
+        <div id="victory-card">
+          <div id="victory-header">◆&nbsp;MISSION ACCOMPLISHED&nbsp;◆</div>
+          <div id="victory-sub">ALL CONNECTIONS DELIVERED</div>
+          <div class="ms-rule"></div>
+          <div class="ms-lbl">FINAL TALLY</div>
+          <div id="victory-total">0</div>
+          <div id="victory-max">of 646,000 possible</div>
+          <div id="v-bar-wrap"><div id="v-bar-fill"></div></div>
+          <div id="victory-pct">0% DELIVERY RATE</div>
+          <div class="ms-rule"></div>
+          <button id="play-again-btn">▶&nbsp;PLAY AGAIN</button>
+        </div>
+      </div>
+
+      <!-- Touch D-Pad -->
+      <div id="dpad">
+        <button id="dpad-up"    class="dpad-btn" aria-label="Move up">▲</button>
+        <button id="dpad-left"  class="dpad-btn" aria-label="Move left">◄</button>
+        <button id="dpad-right" class="dpad-btn" aria-label="Move right">►</button>
+        <button id="dpad-down"  class="dpad-btn" aria-label="Move down">▼</button>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <footer id="status-bar">
+      <span id="status-msg">INITIALIZING…</span>
+      <span id="controls-hint">↑W &nbsp;↓S &nbsp;←A &nbsp;→D &nbsp;ESC:PAUSE</span>
+    </footer>
+
+  </div>
+
+  <!-- Script loading order matters: milestones defines constants used by engine -->
+  <script src="js/milestones.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/hazards.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/ui.js"></script>
+</body>
+</html>

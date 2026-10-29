@@ -1,0 +1,126 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #000;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+}
+
+#gameCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  display: block;
+}
+
+/* ── Retro Arcade HUD ──────────────────────────────────────── */
+#hud {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 58px;
+  background: rgba(0,0,0,0.90);
+  border-bottom: 1px solid #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.hud-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 28px;
+  gap: 1px;
+}
+
+.hud-divider {
+  width: 1px;
+  height: 32px;
+  background: #1e2030;
+  flex-shrink: 0;
+}
+
+.hud-label {
+  font: 700 9px 'Courier New', monospace;
+  letter-spacing: 3px;
+  color: #3a3a55;
+  text-transform: uppercase;
+}
+
+.hud-val {
+  font: 700 21px 'Courier New', monospace;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.hud-val.cyan  { color: #00FFCC; text-shadow: 0 0 8px rgba(0,255,204,0.7); }
+.hud-val.blue  { color: #00AAFF; text-shadow: 0 0 8px rgba(0,170,255,0.7); }
+.hud-val.green { color: #39FF14; text-shadow: 0 0 8px rgba(57,255,20,0.7); }
+.hud-val.gold  { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.7); }
+
+.hud-val.target-hit {
+  animation: targetPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes targetPulse {
+  from { text-shadow: 0 0 8px rgba(255,215,0,0.7); }
+  to   { text-shadow: 0 0 24px #FFD700, 0 0 44px rgba(255,215,0,0.45); }
+}
+
+/* ── Mute button ───────────────────────────────────────────── */
+#muteBtn {
+  position: fixed;
+  top: 12px;
+  right: 14px;
+  z-index: 30;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid #223;
+  border-radius: 6px;
+  color: #00FFCC;
+  font-size: 17px;
+  line-height: 1;
+  padding: 5px 9px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+#muteBtn:hover { background: rgba(0,255,204,0.12); }
+
+/* ── Touch overlay ─────────────────────────────────────────── */
+#tapOverlay {
+  display: none;
+  position: fixed;
+  inset: 58px 0 0 0;
+  z-index: 5;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+}
+#tapOverlay::after {
+  content: 'TAP ANYWHERE TO JUMP';
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  color: rgba(0,255,204,0.26);
+  font: 10px 'Courier New', monospace;
+  letter-spacing: 2px;
+  pointer-events: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  #tapOverlay { display: block; }
+}
+
+/* ── Mobile landscape responsive ──────────────────────────── */
+@media (orientation: landscape) and (max-height: 480px) {
+  #hud {
+    height: 42px;
+  }
+  .hud-val   { font-size: 16px; }
+  .hud-label { font-size: 8px;  }
+  .hud-stat  { padding: 0 16px; }
+  #tapOverlay { inset: 42px 0 0 0; }
+  #muteBtn   { top: 8px; right: 10px; font-size: 15px; padding: 4px 7px; }
+}

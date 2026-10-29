@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>EPB Arcade — Game Select</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #00ff88;
+      --cyan:   #00e5ff;
+      --yellow: #ffe600;
+      --red:    #ff2244;
+      --purple: #c87eff;
+      --bg:     #050810;
+      --panel:  #0b1220;
+      --border: rgba(0, 229, 255, 0.22);
+      --mono:   'Press Start 2P', 'Courier New', monospace;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--cyan);
+      font-family: var(--mono);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
+      padding: 24px 16px;
+    }
+
+    .arcade-title {
+      font-size: clamp(20px, 5vw, 36px);
+      color: var(--yellow);
+      letter-spacing: 0.12em;
+      text-align: center;
+      text-shadow: 0 0 24px rgba(255, 230, 0, 0.5);
+      margin-bottom: 8px;
+    }
+
+    .arcade-sub {
+      font-size: clamp(7px, 1.8vw, 10px);
+      color: var(--cyan);
+      opacity: 0.6;
+      text-align: center;
+      letter-spacing: 0.15em;
+      margin-bottom: 48px;
+    }
+
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 88vw), 1fr));
+      gap: 24px;
+      width: min(900px, 96vw);
+    }
+
+    .game-card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 28px 24px 24px;
+      text-align: center;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+
+    .game-card:hover {
+      border-color: var(--cyan);
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.18);
+      transform: translateY(-3px);
+    }
+
+    .game-card.racer:hover   { border-color: var(--yellow); box-shadow: 0 0 40px rgba(255,230,0,0.18); }
+    .game-card.runner:hover  { border-color: var(--green);  box-shadow: 0 0 40px rgba(0,255,136,0.18); }
+    .game-card.frogger:hover { border-color: var(--purple); box-shadow: 0 0 40px rgba(200,126,255,0.18); }
+
+    .game-icon {
+      font-size: clamp(36px, 8vw, 56px);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .game-name {
+      font-size: clamp(9px, 2.2vw, 13px);
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+    }
+
+    .game-card.racer  .game-name { color: var(--yellow); }
+    .game-card.runner .game-name { color: var(--green); }
+    .game-card.frogger .game-name { color: var(--purple); }
+
+    .game-desc {
+      font-size: clamp(6px, 1.5vw, 8px);
+      color: rgba(0, 229, 255, 0.55);
+      line-height: 1.8;
+      letter-spacing: 0.05em;
+    }
+
+    .play-btn {
+      display: inline-block;
+      margin-top: 20px;
+      font-family: var(--mono);
+      font-size: clamp(6px, 1.4vw, 8px);
+      letter-spacing: 0.12em;
+      padding: 10px 20px;
+      border: 1px solid currentColor;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .game-card.racer  .play-btn { color: var(--yellow); }
+    .game-card.runner .play-btn { color: var(--green); }
+    .game-card.frogger .play-btn { color: var(--purple); }
+
+    .game-card:hover .play-btn {
+      background: currentColor;
+      color: var(--bg);
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: clamp(6px, 1.3vw, 8px);
+      color: rgba(0, 229, 255, 0.28);
+      letter-spacing: 0.12em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="arcade-title">EPB ARCADE</div>
+  <div class="arcade-sub">SELECT YOUR GAME &bull; GM / KDDI MILESTONE TRACKER</div>
+
+  <div class="game-grid">
+
+    <a class="game-card racer" href="cpb-racer/">
+      <span class="game-icon">🚗</span>
+      <div class="game-name">GM CONNECTIONS RALLY</div>
+      <div class="game-desc">
+        Race through GM &amp; KDDI<br>
+        connection milestones.<br>
+        Avoid wildlife. Hit the gas.
+      </div>
+      <div class="play-btn">▶ PLAY</div>
+    </a>
+
+    <a class="game-card runner" href="endless-runner/">
+      <span class="game-icon">🏃</span>
+      <div class="game-name">CPB ENDLESS RUNNER</div>
+      <div class="game-desc">
+        Keep running as connections<br>
+        rack up. Jump over obstacles.<br>
+        How far can you go?
+      </div>
+      <div class="play-btn">▶ PLAY</div>
+    </a>
+
+    <a class="game-card frogger" href="frogger/">
+      <span class="game-icon">🐸</span>
+      <div class="game-name">DATA COURIER</div>
+      <div class="game-desc">
+        Deliver connection batches<br>
+        to the Secure Server.<br>
+        Dodge traffic. All 5 levels.
+      </div>
+      <div class="play-btn">▶ PLAY</div>
+    </a>
+
+  </div>
+
+  <div class="footer">A TELUS EPB PRODUCTION &bull; 2026</div>
+
+</body>
+</html>

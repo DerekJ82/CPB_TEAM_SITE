@@ -12,3 +12,6 @@ desktop.ini
 
 # Clasp credentials — never commit
 .clasprc.json
+
+# Windows network share artifacts
+arcade/frogger/frogger/
