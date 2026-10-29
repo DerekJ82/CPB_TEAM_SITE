@@ -3,7 +3,7 @@
 body {
   background: #000;
   overflow: hidden;
-  font-family: 'Courier New', monospace;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
 }
 
 #gameCanvas {
@@ -13,69 +13,113 @@ body {
   display: block;
 }
 
-/* ── Retro Arcade HUD ──────────────────────────────────────── */
-#hud {
+/* ── How To Play Overlay ───────────────────────────────────── */
+#how-to-play {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+#how-to-play.hidden { display: none; }
+
+.htp-card {
+  background: #0a0a1a;
+  border: 2px solid #00FFCC;
+  border-radius: 12px;
+  padding: 36px 40px 32px;
+  max-width: 520px;
+  width: 90vw;
+  box-shadow: 0 0 40px rgba(0,255,204,0.2);
+}
+
+.htp-card h2 {
+  font-size: clamp(14px, 3vw, 20px);
+  color: #FFD700;
+  text-align: center;
+  margin-bottom: 6px;
+  text-shadow: 0 0 12px rgba(255,215,0,0.6);
+}
+
+.htp-subtitle {
+  font-size: 8px;
+  color: #556;
+  text-align: center;
+  display: block;
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+
+.htp-rules {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.htp-rules li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 9px;
+  color: #aab;
+  line-height: 1.6;
+}
+
+.htp-rules li .icon { flex-shrink: 0; font-size: 18px; }
+.htp-rules li strong { color: #00FFCC; }
+
+.htp-start-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #00FFCC;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.htp-start-btn:hover {
+  background: #00ffee;
+  box-shadow: 0 0 20px rgba(0,255,204,0.5);
+}
+
+/* ── Top HUD ───────────────────────────────────────────────── */
+#top-hud {
   position: fixed;
   top: 0; left: 0; right: 0;
-  height: 58px;
-  background: rgba(0,0,0,0.90);
+  height: 52px;
+  background: rgba(0,0,0,0.92);
   border-bottom: 1px solid #1a1a2e;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0;
+  justify-content: space-between;
+  padding: 0 16px;
   z-index: 20;
-  pointer-events: none;
 }
 
-.hud-stat {
+#hud-target {
+  font-size: 10px;
+  color: #FFD700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(255,215,0,0.5);
+}
+
+.hud-controls {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 0 28px;
-  gap: 1px;
-}
-
-.hud-divider {
-  width: 1px;
-  height: 32px;
-  background: #1e2030;
-  flex-shrink: 0;
-}
-
-.hud-label {
-  font: 700 9px 'Courier New', monospace;
-  letter-spacing: 3px;
-  color: #3a3a55;
-  text-transform: uppercase;
-}
-
-.hud-val {
-  font: 700 21px 'Courier New', monospace;
-  letter-spacing: 1px;
-  line-height: 1;
-}
-
-.hud-val.cyan  { color: #00FFCC; text-shadow: 0 0 8px rgba(0,255,204,0.7); }
-.hud-val.blue  { color: #00AAFF; text-shadow: 0 0 8px rgba(0,170,255,0.7); }
-.hud-val.green { color: #39FF14; text-shadow: 0 0 8px rgba(57,255,20,0.7); }
-.hud-val.gold  { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.7); }
-
-.hud-val.target-hit {
-  animation: targetPulse 0.8s ease-in-out infinite alternate;
-}
-@keyframes targetPulse {
-  from { text-shadow: 0 0 8px rgba(255,215,0,0.7); }
-  to   { text-shadow: 0 0 24px #FFD700, 0 0 44px rgba(255,215,0,0.45); }
+  gap: 12px;
 }
 
 /* ── Mute button ───────────────────────────────────────────── */
 #muteBtn {
-  position: fixed;
-  top: 12px;
-  right: 14px;
-  z-index: 30;
   background: rgba(0,0,0,0.55);
   border: 1px solid #223;
   border-radius: 6px;
@@ -89,38 +133,308 @@ body {
 }
 #muteBtn:hover { background: rgba(0,255,204,0.12); }
 
-/* ── Touch overlay ─────────────────────────────────────────── */
-#tapOverlay {
-  display: none;
-  position: fixed;
-  inset: 58px 0 0 0;
-  z-index: 5;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  touch-action: none;
+/* ── Ignition button ───────────────────────────────────────── */
+#retro-ignition {
+  display: flex;
+  align-items: center;
 }
-#tapOverlay::after {
-  content: 'TAP ANYWHERE TO JUMP';
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  color: rgba(0,255,204,0.26);
-  font: 10px 'Courier New', monospace;
+
+#ignitionBtn {
+  font-family: inherit;
+  font-size: 9px;
   letter-spacing: 2px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid;
+  transition: all 0.2s;
+}
+#ignitionBtn.off {
+  background: #1a0000;
+  color: #ff3333;
+  border-color: #ff3333;
+  box-shadow: 0 0 10px rgba(255,51,51,0.3);
+}
+#ignitionBtn.on {
+  background: #001a00;
+  color: #39FF14;
+  border-color: #39FF14;
+  box-shadow: 0 0 10px rgba(57,255,20,0.3);
+}
+
+/* ── Bottom Retro HUD ──────────────────────────────────────── */
+#retro-hud {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 100px;
+  background: rgba(0,0,0,0.92);
+  border-top: 1px solid #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 20;
+  gap: 16px;
+}
+
+#speedo-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.speedo-svg-wrap {
+  flex-shrink: 0;
+}
+
+.retro-lcd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 52px;
+}
+
+.lcd-label {
+  font-size: 7px;
+  color: #445;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.lcd-value {
+  font-size: 15px;
+  color: #00FFCC;
+  text-shadow: 0 0 8px rgba(0,255,204,0.7);
+  line-height: 1;
+}
+.lcd-value.green { color: #39FF14; text-shadow: 0 0 8px rgba(57,255,20,0.7); }
+
+#milestone-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 1px solid #1a1a2e;
+  padding-left: 20px;
+}
+
+.ms-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ms-label {
+  font-size: 7px;
+  color: #445;
+  letter-spacing: 2px;
+  width: 36px;
+}
+
+.ms-value {
+  font-size: 13px;
+  line-height: 1;
+}
+.ms-value.gm    { color: #00AAFF; text-shadow: 0 0 8px rgba(0,170,255,0.6); }
+.ms-value.kddi  { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.6); }
+.ms-value.total { color: #00FFCC; text-shadow: 0 0 8px rgba(0,255,204,0.6); }
+
+/* ── Floating Penalty Flash ────────────────────────────────── */
+#penalty-flash {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 22px;
+  color: #ff3333;
+  text-shadow: 0 0 16px rgba(255,51,51,0.9);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 50;
+  transition: opacity 0.1s;
+}
+
+/* ── Honk Graphic ──────────────────────────────────────────── */
+#honkGraphic {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  color: #FFD700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.9);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 50;
+}
+
+/* ── Touch Controls ────────────────────────────────────────── */
+#touch-controls {
+  position: fixed;
+  bottom: 108px;
+  left: 0; right: 0;
+  display: none;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 25;
   pointer-events: none;
 }
 @media (hover: none) and (pointer: coarse) {
-  #tapOverlay { display: block; }
+  #touch-controls { display: flex; }
 }
 
-/* ── Mobile landscape responsive ──────────────────────────── */
-@media (orientation: landscape) and (max-height: 480px) {
-  #hud {
-    height: 42px;
-  }
-  .hud-val   { font-size: 16px; }
-  .hud-label { font-size: 8px;  }
-  .hud-stat  { padding: 0 16px; }
-  #tapOverlay { inset: 42px 0 0 0; }
-  #muteBtn   { top: 8px; right: 10px; font-size: 15px; padding: 4px 7px; }
+.tc-cluster {
+  display: grid;
+  gap: 6px;
+  pointer-events: auto;
+}
+.tc-cluster-left  { grid-template-columns: 1fr 1fr; }
+.tc-cluster-right { grid-template-columns: 1fr; }
+
+.tc-btn {
+  width: 56px;
+  height: 56px;
+  background: rgba(0,255,204,0.1);
+  border: 1px solid rgba(0,255,204,0.35);
+  border-radius: 8px;
+  color: #00FFCC;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  touch-action: none;
+  transition: background 0.1s;
+}
+.tc-btn:active { background: rgba(0,255,204,0.25); }
+
+.tc-accel { color: #39FF14; border-color: rgba(57,255,20,0.35); background: rgba(57,255,20,0.1); }
+.tc-brake  { color: #ff3333; border-color: rgba(255,51,51,0.35);  background: rgba(255,51,51,0.1); }
+.tc-accel:active { background: rgba(57,255,20,0.25); }
+.tc-brake:active  { background: rgba(255,51,51,0.25); }
+
+/* ── Pause Overlay ─────────────────────────────────────────── */
+#pause-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+}
+#pause-overlay.hidden { display: none; }
+
+.pause-card {
+  background: #0a0a1a;
+  border: 2px solid #00FFCC;
+  border-radius: 10px;
+  padding: 40px 60px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(0,255,204,0.2);
+}
+
+.pause-title {
+  font-size: 24px;
+  color: #00FFCC;
+  text-shadow: 0 0 16px rgba(0,255,204,0.8);
+  margin-bottom: 14px;
+}
+
+.pause-hint {
+  font-size: 9px;
+  color: #445;
+  letter-spacing: 2px;
+}
+
+/* ── Victory Modal ─────────────────────────────────────────── */
+#victory-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+}
+#victory-modal.hidden { display: none; }
+
+.vm-card {
+  background: #0a0a1a;
+  border: 2px solid #FFD700;
+  border-radius: 12px;
+  padding: 40px 48px 36px;
+  min-width: 320px;
+  text-align: center;
+  box-shadow: 0 0 50px rgba(255,215,0,0.25);
+}
+
+.vm-title {
+  font-size: clamp(16px, 4vw, 22px);
+  color: #FFD700;
+  text-shadow: 0 0 16px rgba(255,215,0,0.8);
+  margin-bottom: 28px;
+}
+
+.vm-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+  border-top: 1px solid #1a1a2e;
+  border-bottom: 1px solid #1a1a2e;
+  padding: 20px 0;
+}
+
+.vm-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.vm-label {
+  font-size: 8px;
+  color: #445;
+  letter-spacing: 2px;
+}
+
+.vm-val {
+  font-size: 14px;
+  color: #00FFCC;
+}
+.vm-val.red  { color: #ff3333; text-shadow: 0 0 8px rgba(255,51,51,0.6); }
+.vm-val.gold { color: #FFD700; text-shadow: 0 0 8px rgba(255,215,0,0.6); }
+
+.vm-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #FFD700;
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.vm-btn:hover {
+  background: #ffe84d;
+  box-shadow: 0 0 20px rgba(255,215,0,0.5);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .htp-card { padding: 24px 20px; }
+  .htp-card h2 { font-size: 13px; }
+  #retro-hud { height: 84px; }
+  .speedo-svg-wrap svg { width: 100px; height: 58px; }
+  .lcd-value { font-size: 12px; }
+  .ms-value  { font-size: 11px; }
+  .vm-card   { padding: 28px 24px; min-width: unset; width: 90vw; }
+  .vm-title  { font-size: 15px; }
 }
