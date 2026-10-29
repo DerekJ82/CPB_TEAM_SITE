@@ -544,6 +544,37 @@ a{color:var(--purple)}
 .links-note{font-family:var(--text);font-size:12.5px;color:var(--grey);
   margin:-4px 0 14px;line-height:1.5}
 
+/* --------------------------------------- ARCADE */
+.arcade-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.arcade-card{display:block;text-decoration:none;color:inherit;
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;
+  transition:transform .2s cubic-bezier(.2,0,0,1),box-shadow .2s cubic-bezier(.2,0,0,1),border-color .2s}
+.arcade-card:hover{transform:translateY(-4px);border-color:var(--purple);
+  box-shadow:0 14px 36px rgba(75,40,109,.13)}
+.arcade-banner{height:170px;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden}
+.arcade-banner::before{content:'';position:absolute;inset:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:18px 18px}
+.arcade-banner-icon{font-size:66px;position:relative;
+  filter:drop-shadow(0 4px 18px rgba(0,0,0,.45))}
+.arcade-banner--racer{background:linear-gradient(135deg,#1c0a35 0%,#4B286D 55%,#7a4b9e 100%)}
+.arcade-banner--runner{background:linear-gradient(135deg,#0a2410 0%,#1b6b3a 55%,#3aa063 100%)}
+.arcade-banner--frogger{background:linear-gradient(135deg,#0a1828 0%,#1a4a72 55%,#2e7ab0 100%)}
+.arcade-body{padding:18px 20px 20px}
+.arcade-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.arcade-name{font-family:var(--disp);font-weight:800;font-size:14px;
+  letter-spacing:-.012em;color:var(--ink)}
+.arcade-play{font-family:var(--micro);font-size:10px;font-weight:700;
+  color:var(--purple);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;
+  transition:color .2s}
+.arcade-card:hover .arcade-play{color:var(--green)}
+.arcade-desc{font-family:var(--text);font-size:12.5px;color:var(--grey);
+  line-height:1.5;margin:0}
+.arcade-tags{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.arcade-tag{font-family:var(--micro);font-size:10px;font-weight:600;
+  background:var(--tint2);color:var(--grey-l);border-radius:100px;padding:3px 10px}
+
 /* --------------------------------------- PIPELINE LOADING */
 .pipe-loading{padding:clamp(60px,8vw,100px) var(--gut);text-align:center}
 .pipe-loading .eyebrow{display:block;margin-bottom:12px}

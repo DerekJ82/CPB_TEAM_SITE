@@ -126,6 +126,7 @@
   <i data-section="pipelines" data-tab="admin"     data-label="CPB Hub Access Requests" data-admin="true"></i>
   <!-- Playground -->
   <i data-section="playground" data-tab="links"    data-label="Links &amp; Resources"></i>
+  <i data-section="playground" data-tab="arcade"   data-label="Arcade"></i>
   <!-- Engagement -->
   <i data-section="engagement" data-tab="eng-dashboard" data-label="Dashboard"></i>
   <i data-section="engagement" data-tab="eng-trends"    data-label="Trends"></i>
@@ -573,13 +574,15 @@
                 <p class="link-desc">Central dashboard for CPB revenue, margin, and KPI reporting across all LOBs.</p>
               </div>
             </a>
-            <a class="link-card" href="https://go/racecourse" target="_blank" rel="noopener">
-              <div class="link-icon">&#127955;</div>
+            <div class="link-card" role="button" tabindex="0" style="cursor:pointer"
+                 onclick="showTab('arcade')"
+                 onkeydown="if(event.key==='Enter'||event.key===' ')showTab('arcade')">
+              <div class="link-icon" style="background:var(--purple);color:#fff">&#128377;</div>
               <div class="link-body">
-                <span class="link-title">Car Race</span>
-                <p class="link-desc">GM milestone tracker — watch the convoy race toward the 1M vehicle base target.</p>
+                <span class="link-title">Arcade</span>
+                <p class="link-desc">Three GM milestone tracker games — race, run, or courier your way to 646,000 connections.</p>
               </div>
-            </a>
+            </div>
           </div>
         </div>
 
@@ -672,6 +675,82 @@
           </div>
         </div>
 
+      </div>
+    </section>
+  </div>
+
+
+  <!-- ═══════════════════════ PLAYGROUND: ARCADE ══════════════════════ -->
+  <div class="tabview" id="view-arcade" hidden>
+    <header class="hero">
+      <div class="hero-in">
+        <span class="eyebrow">Playground &middot; Arcade</span>
+        <h1 class="hero-t">Game Room.</h1>
+        <p class="hero-l">Take a break, crush some milestones. Three games, all GM connections themed.</p>
+      </div>
+    </header>
+
+    <section class="sect">
+      <div class="pad">
+
+        <div class="sect-head reveal">
+          <p class="sect-sub">Each game tracks the real GM &amp; KDDI connection rollout — from the 2024 launch to today&rsquo;s milestone. Pick a game and play.</p>
+        </div>
+
+        <div class="arcade-grid reveal">
+
+          <a class="arcade-card" href="https://derekj82.github.io/dashboard-assets/arcade/cpb-racer/" target="_blank" rel="noopener">
+            <div class="arcade-banner arcade-banner--racer">
+              <span class="arcade-banner-icon">&#127950;</span>
+            </div>
+            <div class="arcade-body">
+              <div class="arcade-row">
+                <span class="arcade-name">GM Connections Rally</span>
+                <span class="arcade-play">Play &rarr;</span>
+              </div>
+              <p class="arcade-desc">Race through GM &amp; KDDI connection milestones. Dodge wildlife. Hit the gas toward 500,000.</p>
+              <div class="arcade-tags">
+                <span class="arcade-tag">Racing</span>
+                <span class="arcade-tag">Top-down</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="arcade-card" href="https://derekj82.github.io/dashboard-assets/arcade/endless-runner/" target="_blank" rel="noopener">
+            <div class="arcade-banner arcade-banner--runner">
+              <span class="arcade-banner-icon">&#127939;</span>
+            </div>
+            <div class="arcade-body">
+              <div class="arcade-row">
+                <span class="arcade-name">CPB Endless Runner</span>
+                <span class="arcade-play">Play &rarr;</span>
+              </div>
+              <p class="arcade-desc">Keep running as connections rack up. Jump obstacles and see how far the convoy can go.</p>
+              <div class="arcade-tags">
+                <span class="arcade-tag">Endless Runner</span>
+                <span class="arcade-tag">Side-scrolling</span>
+              </div>
+            </div>
+          </a>
+
+          <a class="arcade-card" href="https://derekj82.github.io/dashboard-assets/arcade/frogger/" target="_blank" rel="noopener">
+            <div class="arcade-banner arcade-banner--frogger">
+              <span class="arcade-banner-icon">&#128056;</span>
+            </div>
+            <div class="arcade-body">
+              <div class="arcade-row">
+                <span class="arcade-name">Data Courier</span>
+                <span class="arcade-play">Play &rarr;</span>
+              </div>
+              <p class="arcade-desc">Deliver connection batches to the Secure Server. Dodge traffic across all 5 milestone levels.</p>
+              <div class="arcade-tags">
+                <span class="arcade-tag">Frogger-style</span>
+                <span class="arcade-tag">5 Levels</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
       </div>
     </section>
   </div>
