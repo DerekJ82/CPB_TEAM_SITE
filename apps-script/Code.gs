@@ -1290,6 +1290,128 @@ function setupAnniversaryTrigger() {
 }
 
 
+// ─── Weekly Team Note ─────────────────────────────────────────────────────────
+// sendWeeklyTeamNote(): fires every Monday at 8 AM PT and posts a summary of
+// team calendar events for the week (Mon–Sun) to the Planny chat space.
+//
+// Setup (run once from the Apps Script editor):
+//   setupWeeklyTeamNoteTrigger()
+
+var _WEEK_DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function sendWeeklyTeamNote() {
+  var props = PropertiesService.getScriptProperties();
+  var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
+  if (!url) {
+    Logger.log('sendWeeklyTeamNote: no CHAT_WEBHOOK_URL_PLANNY — skipped.');
+    return;
+  }
+
+  var tz  = 'America/Vancouver';
+  var now = new Date();
+
+  // Compute Mon–Sun window for the current week
+  var dow       = parseInt(Utilities.formatDate(now, tz, 'u'), 10); // 1=Mon…7=Sun
+  var monday    = new Date(now.getTime() - (dow - 1) * 86400000);
+  var sunday    = new Date(monday.getTime() + 6 * 86400000);
+  var mondayStr = Utilities.formatDate(monday, tz, 'yyyy-MM-dd');
+  var sundayStr = Utilities.formatDate(sunday, tz, 'yyyy-MM-dd');
+
+  // Read Team Calendar sheet directly (bypasses cache for fresh data)
+  var events = [];
+  var sheetId = props.getProperty('TEAM_SHEET_ID') || props.getProperty('CALENDAR_EVENTS_SHEET_ID');
+  if (sheetId) {
+    try {
+      var ss   = SpreadsheetApp.openById(sheetId);
+      var tab  = ss.getSheetByName('Team Calendar') || ss.getSheets()[0];
+      var rows = tab.getDataRange().getValues();
+      if (rows.length > 1) {
+        var headers = rows[0].map(function(h) { return String(h).trim().toLowerCase(); });
+        var iDate  = headers.indexOf('date');
+        var iTime  = headers.indexOf('time');
+        var iTitle = headers.indexOf('title');
+        for (var i = 1; i < rows.length; i++) {
+          var row = rows[i];
+          var raw = iDate >= 0 ? row[iDate] : '';
+          if (!raw) continue;
+          var d = raw instanceof Date ? raw : new Date(raw);
+          if (isNaN(d.getTime())) continue;
+          var dateStr = Utilities.formatDate(d, tz, 'yyyy-MM-dd');
+          if (dateStr < mondayStr || dateStr > sundayStr) continue;
+          var title = iTitle >= 0 ? String(row[iTitle]).trim() : '';
+          if (!title) continue;
+          var time = '';
+          if (iTime >= 0 && row[iTime]) {
+            var t = row[iTime];
+            time = t instanceof Date ? Utilities.formatDate(t, tz, 'h:mm a') : String(t).trim();
+          }
+          events.push({ dateStr: dateStr, time: time, title: title });
+        }
+        events.sort(function(a, b) { return a.dateStr < b.dateStr ? -1 : a.dateStr > b.dateStr ? 1 : 0; });
+      }
+    } catch (ex) {
+      Logger.log('sendWeeklyTeamNote sheet error: ' + ex);
+    }
+  }
+
+  // Build message
+  var lines = ['Good morning, CPB! 👋', '', '📅 *Here\'s what\'s on the team calendar this week:*', ''];
+
+  if (events.length === 0) {
+    lines.push('Nothing scheduled this week — enjoy the open space! 🧘');
+  } else {
+    events.forEach(function(ev) {
+      var d   = new Date(ev.dateStr + 'T12:00:00');
+      var dow = d.getDay(); // 0=Sun…6=Sat
+      var label = _WEEK_DAY_LABELS[dow] + ' ' +
+        Utilities.formatDate(new Date(ev.dateStr + 'T12:00:00'), tz, 'MMM d');
+      var line = '*' + label + '* — ' + ev.title;
+      if (ev.time) line += ' @ ' + ev.time;
+      lines.push(line);
+    });
+    lines.push('');
+    lines.push('If you\'d like to attend any of these sessions, reach out to Derek in advance so we can make room for you. 🙌');
+  }
+
+  var siteUrl = props.getProperty('TEAM_SITE_URL');
+  if (siteUrl) {
+    lines.push('');
+    lines.push('📆 Full calendar: ' + siteUrl);
+  }
+
+  lines.push('');
+  lines.push('Have a great week! 🚀');
+
+  var msg = lines.join('\n');
+
+  try {
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'post',
+      contentType: 'application/json',
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ text: msg })
+    });
+    Logger.log('sendWeeklyTeamNote: HTTP ' + resp.getResponseCode() + ' — ' + events.length + ' event(s) posted.');
+  } catch (e) {
+    Logger.log('sendWeeklyTeamNote error: ' + e);
+  }
+}
+
+// Run once from the Apps Script editor to install the weekly Monday 8 AM PT trigger.
+function setupWeeklyTeamNoteTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendWeeklyTeamNote') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('sendWeeklyTeamNote')
+    .timeBased()
+    .onWeekDay(ScriptApp.WeekDay.MONDAY)
+    .atHour(8)
+    .inTimezone('America/Vancouver')
+    .create();
+  Logger.log('setupWeeklyTeamNoteTrigger: Monday 8 AM PT trigger installed.');
+}
+
+
 // ─── Admin: Access Control ────────────────────────────────────────────────────
 // Checks whether the current user is in the EPB Hub admin list.
 // Used by doGet to gate the admin panel in the Team Site UI.
