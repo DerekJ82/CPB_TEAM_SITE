@@ -322,30 +322,46 @@ html, body {
 .ms-rule {
   height: 1px;
   background: rgba(255,255,255,0.12);
-  margin: 16px 0;
+  margin: 12px 0;
 }
 .ms-lbl {
   font-size: 9px;
   color: rgba(255,255,255,0.50);
-  letter-spacing: 0.22em;
-  margin-bottom: 8px;
+  letter-spacing: 0.18em;
+}
+
+/* Side-by-side label + value row */
+.ms-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 2px 0;
+  text-align: left;
+}
+.ms-stat .ms-lbl {
+  flex-shrink: 0;
+  margin-bottom: 0;
 }
 
 #ms-delivered-val {
-  font-size: clamp(22px, 5vw, 28px);
+  font-size: clamp(18px, 4vw, 24px);
   font-weight: bold;
-  margin-bottom: 10px;
+  text-align: right;
+  margin-bottom: 0;
 }
 #ms-penalty {
   font-size: 10px;
-  margin-bottom: 4px;
+  margin: 6px 0 2px;
   letter-spacing: 0.1em;
+  text-align: center;
 }
 
 #ms-total-val {
-  font-size: clamp(18px, 4vw, 22px);
+  font-size: clamp(16px, 3.5vw, 20px);
   font-weight: bold;
-  margin-bottom: 14px;
+  text-align: right;
+  margin-bottom: 0;
 }
 
 #ms-bar-wrap {
