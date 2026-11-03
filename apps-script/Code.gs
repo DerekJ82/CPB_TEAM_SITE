@@ -1118,13 +1118,13 @@ function _brQueriesDeleteTriggersFor(funcName) {
 // ─── PulseCheck Webhook ───────────────────────────────────────────────────────
 // sendDailyPulseCheckNudge(): fires each morning via a time-based trigger and
 // posts a rotating funny reminder to the Planny chat space.
-// Silently exits after the Nov 6 deadline so the trigger can stay installed.
+// Silently exits after the Nov 3 deadline — team hit 100% completion Nov 3.
 //
 // Setup (run once from the Apps Script editor):
 //   setupDailyPulseCheckTrigger()
 // That installs a daily 9 AM PT trigger automatically.
 
-var _PC_DEADLINE_UTC = new Date('2026-11-07T08:00:00Z'); // Nov 6 23:59:59 PST
+var _PC_DEADLINE_UTC = new Date('2026-11-04T08:00:00Z'); // Nov 3 end of day PST — 100% complete
 
 var _PC_NUDGES = [
   '☕ Good morning, CPB! PulseCheck won\'t complete itself — trust me, we asked it nicely. *{remaining}* Go click some buttons!',
