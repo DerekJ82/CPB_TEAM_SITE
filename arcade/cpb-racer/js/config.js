@@ -27,7 +27,7 @@ const OFF_ROAD_LIMIT =  MAX_SPEED / 4;
 // ── Milestone data ────────────────────────────────────────────
 const rallyMilestones = [
   { pct: 0.15, gm:  25000, kddi:      0 },
-  { pct: 0.30, gm: 198000, kddi:  12000 },
+  { pct: 0.30, gm: 198239, kddi:  14604 },
   { pct: 0.50, gm: 523028, kddi:  41055 },
   { pct: 0.65, gm: 571810, kddi:  43780 },
   { pct: 0.82, gm: 618221, kddi:  48976 },
@@ -58,7 +58,7 @@ const ANIMAL_DEFS = [
 // ── Milestone sign definitions ─────────────────────────────────
 const SIGN_DEFS = [
   { pct: 0.15, label: '2024 — 25K' },
-  { pct: 0.30, label: '2025 — 210K' },
+  { pct: 0.30, label: '2025 — 213K' },
   { pct: 0.50, label: 'JUL 2026 — 564K' },
   { pct: 0.65, label: 'AUG 2026 — 615K' },
   { pct: 0.82, label: 'OCT 2026 — 667K' },
