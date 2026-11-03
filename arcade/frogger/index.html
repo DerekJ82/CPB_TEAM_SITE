@@ -71,45 +71,6 @@
         </div>
       </div>
 
-      <!-- Milestone popup -->
-      <div id="milestone-overlay" class="screen-layer hidden">
-        <div id="milestone-card">
-          <div id="ms-header">[ CONNECTION SECURED ]</div>
-          <div id="ms-period">——</div>
-          <div id="ms-batch">——</div>
-          <div class="ms-rule"></div>
-          <div class="ms-stat">
-            <span class="ms-lbl">CONNECTIONS DELIVERED</span>
-            <span id="ms-delivered-val">0</span>
-          </div>
-          <div id="ms-penalty"></div>
-          <div class="ms-rule"></div>
-          <div class="ms-stat">
-            <span class="ms-lbl">GRAND TOTAL SECURED</span>
-            <span id="ms-total-val">0</span>
-          </div>
-          <div id="ms-bar-wrap"><div id="ms-bar-fill"></div></div>
-          <div id="ms-pct">0%</div>
-          <div id="ms-next">——</div>
-        </div>
-      </div>
-
-      <!-- Victory screen -->
-      <div id="victory-overlay" class="screen-layer hidden">
-        <div id="victory-card">
-          <div id="victory-header">◆&nbsp;MISSION ACCOMPLISHED&nbsp;◆</div>
-          <div id="victory-sub">ALL CONNECTIONS DELIVERED</div>
-          <div class="ms-rule"></div>
-          <div class="ms-lbl">FINAL TALLY</div>
-          <div id="victory-total">0</div>
-          <div id="victory-max">of 646,000 possible</div>
-          <div id="v-bar-wrap"><div id="v-bar-fill"></div></div>
-          <div id="victory-pct">0% DELIVERY RATE</div>
-          <div class="ms-rule"></div>
-          <button id="play-again-btn">▶&nbsp;PLAY AGAIN</button>
-        </div>
-      </div>
-
       <!-- Touch D-Pad -->
       <div id="dpad">
         <button id="dpad-up"    class="dpad-btn" aria-label="Move up">▲</button>
@@ -125,6 +86,45 @@
       <span id="controls-hint">↑W &nbsp;↓S &nbsp;←A &nbsp;→D &nbsp;ESC:PAUSE</span>
     </footer>
 
+  </div>
+
+  <!-- ─── Milestone popup (body-level so position:fixed is unaffected by canvas-wrap) -->
+  <div id="milestone-overlay" class="hidden">
+    <div id="milestone-card">
+      <div id="ms-header">[ CONNECTION SECURED ]</div>
+      <div id="ms-period">——</div>
+      <div id="ms-batch">——</div>
+      <div class="ms-rule"></div>
+      <div class="ms-stat">
+        <span class="ms-lbl">CONNECTIONS DELIVERED</span>
+        <span id="ms-delivered-val">0</span>
+      </div>
+      <div id="ms-penalty"></div>
+      <div class="ms-rule"></div>
+      <div class="ms-stat">
+        <span class="ms-lbl">GRAND TOTAL SECURED</span>
+        <span id="ms-total-val">0</span>
+      </div>
+      <div id="ms-bar-wrap"><div id="ms-bar-fill"></div></div>
+      <div id="ms-pct">0%</div>
+      <div id="ms-next">——</div>
+    </div>
+  </div>
+
+  <!-- ─── Victory screen (body-level for same reason) -->
+  <div id="victory-overlay" class="hidden">
+    <div id="victory-card">
+      <div id="victory-header">◆&nbsp;MISSION ACCOMPLISHED&nbsp;◆</div>
+      <div id="victory-sub">ALL CONNECTIONS DELIVERED</div>
+      <div class="ms-rule"></div>
+      <div class="ms-lbl">FINAL TALLY</div>
+      <div id="victory-total">0</div>
+      <div id="victory-max">of 646,000 possible</div>
+      <div id="v-bar-wrap"><div id="v-bar-fill"></div></div>
+      <div id="victory-pct">0% DELIVERY RATE</div>
+      <div class="ms-rule"></div>
+      <button id="play-again-btn">▶&nbsp;PLAY AGAIN</button>
+    </div>
   </div>
 
   <!-- Script loading order matters: milestones defines constants used by engine -->

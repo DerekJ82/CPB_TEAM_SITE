@@ -246,13 +246,20 @@ html, body {
 }
 .screen-layer.hidden { display: none; }
 
-/* Milestone and victory cards can be taller than the canvas — use fixed
-   positioning so they aren't clipped by #canvas-wrap { overflow: hidden } */
+/* Milestone and victory overlays live at body level — guaranteed unaffected
+   by #canvas-wrap overflow, transforms, or stacking context */
 #milestone-overlay,
 #victory-overlay {
   position: fixed;
-  z-index: 200;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 20, 0.88);
 }
+#milestone-overlay.hidden,
+#victory-overlay.hidden { display: none; }
 
 /* ─── Pause Overlay ────────────────────────────────────────────────────────── */
 #pause-card {
@@ -336,16 +343,17 @@ html, body {
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  margin: 2px 0;
+  margin: 6px 0;
   text-align: left;
 }
 .ms-stat .ms-lbl {
   flex-shrink: 0;
   margin-bottom: 0;
+  text-align: left;
 }
 
 #ms-delivered-val {
-  font-size: clamp(18px, 4vw, 24px);
+  font-size: clamp(18px, 4vw, 22px);
   font-weight: bold;
   text-align: right;
   margin-bottom: 0;
@@ -358,7 +366,7 @@ html, body {
 }
 
 #ms-total-val {
-  font-size: clamp(16px, 3.5vw, 20px);
+  font-size: clamp(16px, 3.5vw, 18px);
   font-weight: bold;
   text-align: right;
   margin-bottom: 0;
