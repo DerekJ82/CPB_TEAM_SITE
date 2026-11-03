@@ -326,7 +326,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v10';
+  var cacheKey = 'cal_data_v11';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -379,9 +379,14 @@ function getCalendarData() {
           } else if (eventDateStr > todayStr) {
             isPast = false;
           } else {
-            // Same day — compare event time to now if available
+            // Same day — Sheets time values are Date objects anchored to Dec 30 1899;
+            // compare HH:mm strings in the same timezone to avoid epoch comparison trap
             var tRaw = iTime >= 0 ? row[iTime] : null;
-            isPast = (tRaw instanceof Date) ? tRaw < now : false;
+            if (tRaw instanceof Date) {
+              isPast = Utilities.formatDate(tRaw, tz, 'HH:mm') < Utilities.formatDate(now, tz, 'HH:mm');
+            } else {
+              isPast = false;
+            }
           }
 
           events.push({
@@ -484,7 +489,7 @@ function syncTeamCalendar() {
   tab.getRange(1, 1, allRows.length, headers.length).setValues(allRows);
 
   // Invalidate cache so the next page load gets fresh data
-  try { CacheService.getScriptCache().remove('cal_data_v10'); } catch (e) {}
+  try { CacheService.getScriptCache().remove('cal_data_v11'); } catch (e) {}
 
   Logger.log('syncTeamCalendar: wrote ' + autoRows.length + ' auto + ' + manualRows.length + ' manual rows.');
 }
