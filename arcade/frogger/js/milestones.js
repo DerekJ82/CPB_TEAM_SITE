@@ -2,13 +2,13 @@
 
 const MILESTONE_DATA = [
   { level: 1, period: '2024',     batch: 'GM Launch Batch', payload: 25_000,  cumulative: 25_000,  tagline: 'FIRST CONNECTIONS ESTABLISHED', accent: '#00e5ff' },
-  { level: 2, period: '2025',     batch: 'KDDI Expansion',  payload: 185_000, cumulative: 210_000, tagline: 'NETWORK GROWS ACROSS REGIONS',  accent: '#00ff88' },
-  { level: 3, period: 'JUL 2026', batch: 'Scale-Up Push',   payload: 354_000, cumulative: 564_000, tagline: 'MASSIVE DEPLOYMENT UNDERWAY',   accent: '#ffe600' },
-  { level: 4, period: 'AUG 2026', batch: 'Surge Sprint',    payload: 51_000,  cumulative: 615_000, tagline: 'SURGING PAST 600K',             accent: '#ff9900' },
-  { level: 5, period: 'OCT 2026', batch: 'Final Mile',      payload: 52_000,  cumulative: 667_000, tagline: 'OCTOBER MILESTONE REACHED',      accent: '#ff44aa' },
+  { level: 2, period: '2025',     batch: 'KDDI Expansion',  payload: 187_843, cumulative: 212_843, tagline: 'NETWORK GROWS ACROSS REGIONS',  accent: '#00ff88' },
+  { level: 3, period: 'JUL 2026', batch: 'Scale-Up Push',   payload: 351_240, cumulative: 564_083, tagline: 'MASSIVE DEPLOYMENT UNDERWAY',   accent: '#ffe600' },
+  { level: 4, period: 'AUG 2026', batch: 'Surge Sprint',    payload: 51_507,  cumulative: 615_590, tagline: 'SURGING PAST 600K',             accent: '#ff9900' },
+  { level: 5, period: 'OCT 2026', batch: 'Final Mile',      payload: 51_607,  cumulative: 667_197, tagline: 'OCTOBER MILESTONE REACHED',      accent: '#ff44aa' },
 ];
 
-const GRAND_TARGET    = 667_000;
+const GRAND_TARGET    = 667_197;
 const PENALTY_PER_HIT = 5_000;
 
 function formatNum(n) {
