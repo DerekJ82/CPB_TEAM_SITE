@@ -5,10 +5,10 @@ const MILESTONE_DATA = [
   { level: 2, period: '2025',     batch: 'KDDI Expansion',  payload: 185_000, cumulative: 210_000, tagline: 'NETWORK GROWS ACROSS REGIONS',  accent: '#00ff88' },
   { level: 3, period: 'JUL 2026', batch: 'Scale-Up Push',   payload: 354_000, cumulative: 564_000, tagline: 'MASSIVE DEPLOYMENT UNDERWAY',   accent: '#ffe600' },
   { level: 4, period: 'AUG 2026', batch: 'Surge Sprint',    payload: 51_000,  cumulative: 615_000, tagline: 'SURGING PAST 600K',             accent: '#ff9900' },
-  { level: 5, period: 'SEP 2026', batch: 'Final Mile',      payload: 31_000,  cumulative: 646_000, tagline: 'FULL DEPLOYMENT ACHIEVED',      accent: '#ff44aa' },
+  { level: 5, period: 'OCT 2026', batch: 'Final Mile',      payload: 52_000,  cumulative: 667_000, tagline: 'OCTOBER MILESTONE REACHED',      accent: '#ff44aa' },
 ];
 
-const GRAND_TARGET    = 646_000;
+const GRAND_TARGET    = 667_000;
 const PENALTY_PER_HIT = 5_000;
 
 function formatNum(n) {

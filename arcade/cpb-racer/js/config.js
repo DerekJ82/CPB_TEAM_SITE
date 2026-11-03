@@ -30,7 +30,7 @@ const rallyMilestones = [
   { pct: 0.30, gm: 198000, kddi:  12000 },
   { pct: 0.50, gm: 523028, kddi:  41055 },
   { pct: 0.65, gm: 571810, kddi:  43780 },
-  { pct: 0.82, gm: 599788, kddi:  46561 },
+  { pct: 0.82, gm: 618221, kddi:  48976 },
 ];
 
 // ── Colour palettes ───────────────────────────────────────────
@@ -61,5 +61,5 @@ const SIGN_DEFS = [
   { pct: 0.30, label: '2025 — 210K' },
   { pct: 0.50, label: 'JUL 2026 — 564K' },
   { pct: 0.65, label: 'AUG 2026 — 615K' },
-  { pct: 0.82, label: 'SEP 2026 — 646K' },
+  { pct: 0.82, label: 'OCT 2026 — 667K' },
 ];

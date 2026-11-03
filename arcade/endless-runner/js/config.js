@@ -53,10 +53,15 @@ const CONFIG = {
     { worldX: 23625, type: 'gm',   value: 8529 },
     { worldX: 24495, type: 'gm',   value: 8529 },
     { worldX: 25365, type: 'gm',   value: 8528 },
+
+    // Segment 4: SEP 2026 → OCT 2026 — GM delta 18,433 / KDDI delta 2,415
+    { worldX: 26235, type: 'gm',   value: 9217 },
+    { worldX: 27105, type: 'kddi', value: 2415 },
+    { worldX: 27975, type: 'gm',   value: 9216 },
   ],
   OBSTACLE_PENALTY:   15000,
   INVINCIBILITY_SECS:   1.5,
-  TARGET_TOTAL:      646349,
+  TARGET_TOTAL:      667197,
 
   // Milestone popup duration (seconds)
   MILESTONE_PAUSE_SECS: 5.0,
@@ -72,8 +77,8 @@ const CONFIG = {
     { pct: 0.55, label: 'JUL 2026', sub: '564,083 connections',
       actualGm: 523028, actualKddi: 41055, actualTotal: 564083,
       detail: 'Over half a million connections secured by mid-2026' },
-    { pct: 0.88, label: 'SEP 2026', sub: '646,349 connections',
-      actualGm: 599788, actualKddi: 46561, actualTotal: 646349,
-      detail: 'Rally complete — 646K connections at end of September 2026' },
+    { pct: 0.88, label: 'OCT 2026', sub: '667,197 connections',
+      actualGm: 618221, actualKddi: 48976, actualTotal: 667197,
+      detail: 'Rally complete — 667K connections at end of October 2026' },
   ],
 };
