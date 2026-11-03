@@ -14,9 +14,9 @@ class Player {
   get dead()   { return this._dead; }
   get locked() { return this._locked; }
 
-  // Pixel-space hitbox — slightly smaller than the visual square for fairness
+  // Pixel-space hitbox — smaller inset for more forgiving collision detection
   get rect() {
-    const i = 9;
+    const i = 14;
     return {
       x: this.gridX * GRID.TILE + i,
       y: this.gridY * GRID.TILE + i,

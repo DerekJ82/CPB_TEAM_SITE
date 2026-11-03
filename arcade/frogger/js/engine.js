@@ -32,7 +32,7 @@ canvas.height = GRID.HEIGHT;
 
 /* ─── Game State ───────────────────────────────────────────────────────────── */
 const state = {
-  lives:      3,
+  lives:      5,
   level:      1,
   payload:    0,   // connections being carried this level
   grandTotal: 0,   // cumulative connections delivered
@@ -78,7 +78,7 @@ function startLevel(level) {
 }
 
 function resetGame() {
-  state.lives      = 3;
+  state.lives      = 5;
   state.grandTotal = 0;
   UI.hideVictory();
   startLevel(1);

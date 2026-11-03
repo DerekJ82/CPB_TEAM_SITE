@@ -8,23 +8,23 @@ const CAR_COLORS = {
 
 // Lane definitions — all car traffic, no type distinction
 const HAZARD_LANE_DEFS = [
-  { row: 5,  dir:  1, speed: 70,  count: 2 },
-  { row: 6,  dir: -1, speed: 115, count: 3 },
-  { row: 7,  dir:  1, speed: 55,  count: 2 },
-  { row: 8,  dir: -1, speed: 138, count: 3 },
-  { row: 9,  dir:  1, speed: 92,  count: 2 },
-  { row: 11, dir: -1, speed: 150, count: 3 },
-  { row: 12, dir:  1, speed: 74,  count: 2 },
-  { row: 13, dir: -1, speed: 118, count: 3 },
+  { row: 5,  dir:  1, speed: 48,  count: 2 },
+  { row: 6,  dir: -1, speed: 80,  count: 2 },
+  { row: 7,  dir:  1, speed: 38,  count: 2 },
+  { row: 8,  dir: -1, speed: 96,  count: 2 },
+  { row: 9,  dir:  1, speed: 64,  count: 2 },
+  { row: 11, dir: -1, speed: 105, count: 2 },
+  { row: 12, dir:  1, speed: 52,  count: 2 },
+  { row: 13, dir: -1, speed: 82,  count: 2 },
 ];
 
 // Per-level difficulty scaling
 const LEVEL_CFG = [
   { speedMult: 1.00, extraCount: 0 },  // level 1
-  { speedMult: 1.28, extraCount: 0 },  // level 2
-  { speedMult: 1.58, extraCount: 1 },  // level 3
-  { speedMult: 1.92, extraCount: 1 },  // level 4
-  { speedMult: 2.30, extraCount: 2 },  // level 5
+  { speedMult: 1.18, extraCount: 0 },  // level 2
+  { speedMult: 1.38, extraCount: 0 },  // level 3
+  { speedMult: 1.58, extraCount: 1 },  // level 4
+  { speedMult: 1.80, extraCount: 1 },  // level 5
 ];
 
 /* ════════════════════════════════════════════════════════════════════════════

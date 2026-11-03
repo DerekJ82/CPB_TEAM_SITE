@@ -9,7 +9,7 @@ const MILESTONE_DATA = [
 ];
 
 const GRAND_TARGET    = 646_000;
-const PENALTY_PER_HIT = 15_000;
+const PENALTY_PER_HIT = 5_000;
 
 function formatNum(n) {
   return Math.max(0, Math.floor(n)).toLocaleString('en-US');
