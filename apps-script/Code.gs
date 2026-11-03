@@ -326,7 +326,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v8';
+  var cacheKey = 'cal_data_v9';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -360,8 +360,12 @@ function getCalendarData() {
           if (!raw) continue;
           var d = raw instanceof Date ? raw : new Date(raw);
           if (isNaN(d.getTime())) continue;
-          var cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-          if (d < cutoff) continue;
+          // Start of current week (Monday 00:00:00 in script timezone)
+          var weekStart = new Date(now);
+          weekStart.setHours(0, 0, 0, 0);
+          var dow = weekStart.getDay(); // 0=Sun, 1=Mon … 6=Sat
+          weekStart.setDate(weekStart.getDate() - (dow === 0 ? 6 : dow - 1));
+          if (d < weekStart) continue;
           events.push({
             date:      Utilities.formatDate(d, tz, 'yyyy-MM-dd'),
             dateLabel: Utilities.formatDate(d, tz, 'MMM d'),
@@ -457,7 +461,7 @@ function syncTeamCalendar() {
   tab.getRange(1, 1, allRows.length, headers.length).setValues(allRows);
 
   // Invalidate cache so the next page load gets fresh data
-  try { CacheService.getScriptCache().remove('cal_data_v8'); } catch (e) {}
+  try { CacheService.getScriptCache().remove('cal_data_v9'); } catch (e) {}
 
   Logger.log('syncTeamCalendar: wrote ' + autoRows.length + ' auto + ' + manualRows.length + ' manual rows.');
 }
