@@ -246,6 +246,14 @@ html, body {
 }
 .screen-layer.hidden { display: none; }
 
+/* Milestone and victory cards can be taller than the canvas — use fixed
+   positioning so they aren't clipped by #canvas-wrap { overflow: hidden } */
+#milestone-overlay,
+#victory-overlay {
+  position: fixed;
+  z-index: 200;
+}
+
 /* ─── Pause Overlay ────────────────────────────────────────────────────────── */
 #pause-card {
   text-align: center;
