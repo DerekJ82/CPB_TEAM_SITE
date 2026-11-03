@@ -389,6 +389,12 @@ function getCalendarData() {
   return resultObj;
 }
 
+// Called by the client-side refresh button: syncs calendar → sheet, then returns fresh data.
+function syncAndGetCalendarData() {
+  syncTeamCalendar();
+  return getCalendarData();
+}
+
 
 // ─── Sync Team Calendar to Sheet ─────────────────────────────────────────────
 // Reads Peacock-colored (color '7') events from derek.johnson@telus.com and

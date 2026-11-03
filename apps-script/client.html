@@ -2012,10 +2012,10 @@ function initRosterMap() {
       .replace(/"/g, '&quot;');
   }
 
-  function renderCalendar() {
+  function renderCalendar(data) {
     var container = document.getElementById('cal-events-container');
     if (!container) return;
-    var raw      = window.CALENDAR_DATA;
+    var raw      = data !== undefined ? data : window.CALENDAR_DATA;
     var events   = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.events) ? raw.events : []);
     var calError = raw && raw.calError ? raw.calError : null;
 
@@ -2132,6 +2132,24 @@ function initRosterMap() {
       var st = (row.getAttribute('data-status') || '').replace(' ', '-');
       row.hidden = filter !== 'all' && st !== filter;
     });
+  };
+
+  window.refreshCalendar = function () {
+    var btn = document.getElementById('cal-refresh-btn');
+    var container = document.getElementById('cal-events-container');
+    if (btn) { btn.disabled = true; btn.textContent = 'Syncing…'; }
+    if (container) container.innerHTML = '<div class="cal-card-loading"><span class="eyebrow">Syncing calendar…</span></div>';
+    google.script.run
+      .withSuccessHandler(function (data) {
+        window.CALENDAR_DATA = data;
+        renderCalendar(data);
+        if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh'; }
+      })
+      .withFailureHandler(function (err) {
+        if (container) container.innerHTML = '<div class="cal-card-error"><span class="eyebrow">Refresh failed</span><p>' + esc(String(err)) + '</p></div>';
+        if (btn) { btn.disabled = false; btn.textContent = '↻ Refresh'; }
+      })
+      .syncAndGetCalendarData();
   };
 
   function init() {
