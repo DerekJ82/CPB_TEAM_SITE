@@ -5,7 +5,7 @@ const world = (() => {
   let nextObstX  = 0;
 
   // ── Init ──────────────────────────────────────────────────────
-  function reset(canvasWidth) {
+  function reset(canvasWidth, canvasHeight) {
     nodes     = [];
     obstacles = [];
     nextObstX = canvasWidth + 1000;
@@ -22,9 +22,18 @@ const world = (() => {
       isLast:      i === CONFIG.GATE_MILESTONES.length - 1,
     }));
 
+    // Compute the lowest yRatio the player can reach on this screen.
+    // floorY scales with canvas height, but jump height (156px) is fixed —
+    // on tall screens the gap grows until nodes at yRatio 0.79 float above
+    // the jump peak. minY ensures every node sits within jump range.
+    const floorY = canvasHeight * CONFIG.FLOOR_Y_RATIO;
+    const jumpH  = (CONFIG.JUMP_FORCE * CONFIG.JUMP_FORCE) / (2 * CONFIG.GRAVITY);
+    const hitR   = 15 + CONFIG.PLAYER_SIZE * 0.40;
+    const minY   = Math.max(0.72, 1 - (jumpH + hitR) / floorY);
+
     nodes = CONFIG.NODES.map((n, i) => ({
       worldX:    n.worldX,
-      yRatio:    0.79 + (i % 7) * 0.02,   // deterministic vertical spread
+      yRatio:    minY + (i % 5) * 0.04,   // deterministic spread above safe minimum
       r:         15,
       type:      n.type,
       color:     n.type === 'kddi' ? '#39FF14' : '#00AAFF',

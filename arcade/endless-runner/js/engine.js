@@ -166,7 +166,7 @@ function startGame() {
   victoryData    = null;
   pauseTimer     = 0;
   pendingVictory = false;
-  world.reset(canvas.width);
+  world.reset(canvas.width, canvas.height);
   player.init(canvas.height);
   gameState   = 'playing';
   updateHUD();
@@ -258,7 +258,7 @@ function drawStartScreen() {
   ctx.fillStyle    = '#FFD700';
   ctx.shadowBlur   = 10;
   ctx.shadowColor  = '#FFD700';
-  ctx.fillText('TARGET: 646,349 TOTAL CONNECTIONS', cx, bTop + rows.length * lh + 20);
+  ctx.fillText('TARGET: 667,197 TOTAL CONNECTIONS', cx, bTop + rows.length * lh + 20);
   ctx.restore();
 
   // Blink prompt
