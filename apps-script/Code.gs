@@ -326,7 +326,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v7';
+  var cacheKey = 'cal_data_v8';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -360,7 +360,8 @@ function getCalendarData() {
           if (!raw) continue;
           var d = raw instanceof Date ? raw : new Date(raw);
           if (isNaN(d.getTime())) continue;
-          if (d < now) continue;
+          var cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          if (d < cutoff) continue;
           events.push({
             date:      Utilities.formatDate(d, tz, 'yyyy-MM-dd'),
             dateLabel: Utilities.formatDate(d, tz, 'MMM d'),
@@ -372,7 +373,8 @@ function getCalendarData() {
             title:     iTitle >= 0 ? String(row[iTitle]).trim() : '',
             type:      iType  >= 0 ? String(row[iType]).trim()  : 'Team Calendar',
             owner:     iOwner >= 0 ? String(row[iOwner]).trim() : '',
-            notes:     iNotes >= 0 ? String(row[iNotes]).trim() : ''
+            notes:     iNotes >= 0 ? String(row[iNotes]).trim() : '',
+            isPast:    d < now
           });
         }
         events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
@@ -455,7 +457,7 @@ function syncTeamCalendar() {
   tab.getRange(1, 1, allRows.length, headers.length).setValues(allRows);
 
   // Invalidate cache so the next page load gets fresh data
-  try { CacheService.getScriptCache().remove('cal_data_v7'); } catch (e) {}
+  try { CacheService.getScriptCache().remove('cal_data_v8'); } catch (e) {}
 
   Logger.log('syncTeamCalendar: wrote ' + autoRows.length + ' auto + ' + manualRows.length + ' manual rows.');
 }

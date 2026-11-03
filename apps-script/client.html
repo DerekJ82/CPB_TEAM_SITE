@@ -2068,7 +2068,8 @@ function initRosterMap() {
       var lbl      = e.type || 'Event';
       var dateTime = esc(e.dateLabel || e.date || '');
       if (e.time) dateTime += ' &middot; ' + esc(e.time) + ' PST';
-      return '<div class="cal-card">' +
+      return '<div class="cal-card' + (e.isPast ? ' cal-card--past' : '') + '">' +
+        (e.isPast ? '<span class="cal-card-past-badge">Past</span>' : '') +
         '<h4 class="cal-card-title">' + esc(e.title || '') + '</h4>' +
         '<div class="cal-card-datetime">' + dateTime + '</div>' +
         '</div>';

@@ -690,6 +690,10 @@ a{color:var(--purple)}
   min-height:110px;display:flex;flex-direction:column;
   transition:box-shadow .2s,transform .2s,border-color .2s}
 .cal-card:hover{box-shadow:0 5px 16px rgba(0,0,0,.11);transform:translateY(-2px);border-color:var(--purple)}
+.cal-card--past{background:#f5f5f7;border-color:#d8d8de;opacity:.7}
+.cal-card--past:hover{border-color:#b0b0ba;transform:none;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.cal-card--past .cal-card-title{color:#7a7a8a}
+.cal-card-past-badge{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#999;margin-bottom:4px}
 .cal-card-title{font-family:var(--disp);font-weight:900;font-size:clamp(16px,1.8vw,20px);
   line-height:1.25;letter-spacing:-.02em;color:var(--purple);margin:0 0 8px}
 .cal-card-datetime{font-size:clamp(12px,1vw,13px);color:var(--grey);margin-bottom:12px;line-height:1.4}
