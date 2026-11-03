@@ -326,7 +326,7 @@ function syncTeamData() {
 
 function getCalendarData() {
   var cache    = CacheService.getScriptCache();
-  var cacheKey = 'cal_data_v9';
+  var cacheKey = 'cal_data_v10';
   try {
     var hit = cache.get(cacheKey);
     if (hit) return JSON.parse(hit);
@@ -354,20 +354,38 @@ function getCalendarData() {
         var iType   = headers.indexOf('type');
         var iOwner  = headers.indexOf('owner');
         var iNotes  = headers.indexOf('notes');
+        // Monday 00:00:00 of the current week as a yyyy-MM-dd string (timezone-safe)
+        var weekStartDate = new Date(now);
+        var dowNow = weekStartDate.getUTCDay(); // server runs UTC; adjust to Mon-based
+        // Compute Monday in UTC then format in script tz for string comparison
+        weekStartDate.setUTCHours(0, 0, 0, 0);
+        weekStartDate.setUTCDate(weekStartDate.getUTCDate() - (dowNow === 0 ? 6 : dowNow - 1));
+        var weekStartStr = Utilities.formatDate(weekStartDate, tz, 'yyyy-MM-dd');
+        var todayStr     = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+
         for (var i = 1; i < rows.length; i++) {
           var row = rows[i];
           var raw = iDate >= 0 ? row[iDate] : '';
           if (!raw) continue;
           var d = raw instanceof Date ? raw : new Date(raw);
           if (isNaN(d.getTime())) continue;
-          // Start of current week (Monday 00:00:00 in script timezone)
-          var weekStart = new Date(now);
-          weekStart.setHours(0, 0, 0, 0);
-          var dow = weekStart.getDay(); // 0=Sun, 1=Mon … 6=Sat
-          weekStart.setDate(weekStart.getDate() - (dow === 0 ? 6 : dow - 1));
-          if (d < weekStart) continue;
+          var eventDateStr = Utilities.formatDate(d, tz, 'yyyy-MM-dd');
+          if (eventDateStr < weekStartStr) continue;
+
+          // isPast: true only when the event's date+time is before now
+          var isPast;
+          if (eventDateStr < todayStr) {
+            isPast = true;
+          } else if (eventDateStr > todayStr) {
+            isPast = false;
+          } else {
+            // Same day — compare event time to now if available
+            var tRaw = iTime >= 0 ? row[iTime] : null;
+            isPast = (tRaw instanceof Date) ? tRaw < now : false;
+          }
+
           events.push({
-            date:      Utilities.formatDate(d, tz, 'yyyy-MM-dd'),
+            date:      eventDateStr,
             dateLabel: Utilities.formatDate(d, tz, 'MMM d'),
             time:      (function() {
               if (iTime < 0 || !row[iTime]) return '';
@@ -378,7 +396,7 @@ function getCalendarData() {
             type:      iType  >= 0 ? String(row[iType]).trim()  : 'Team Calendar',
             owner:     iOwner >= 0 ? String(row[iOwner]).trim() : '',
             notes:     iNotes >= 0 ? String(row[iNotes]).trim() : '',
-            isPast:    d < now
+            isPast:    isPast
           });
         }
         events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
@@ -420,8 +438,13 @@ function syncTeamCalendar() {
   if (!tab) { Logger.log('syncTeamCalendar: "Team Calendar" tab not found — run setupTeamSheet() first.'); return; }
 
   var now = new Date();
-  var end = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
   var tz  = Session.getScriptTimeZone();
+  // Fetch from Monday of the current week so events added earlier this week are included
+  var weekStart = new Date(now);
+  var dow = weekStart.getUTCDay();
+  weekStart.setUTCHours(0, 0, 0, 0);
+  weekStart.setUTCDate(weekStart.getUTCDate() - (dow === 0 ? 6 : dow - 1));
+  var end = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
   // Preserve manually-added rows (Source column blank or not "auto")
   var existing = tab.getDataRange().getValues();
@@ -437,7 +460,7 @@ function syncTeamCalendar() {
   try {
     var cal = CalendarApp.getCalendarById('derek.johnson@telus.com');
     if (!cal) throw new Error('Calendar derek.johnson@telus.com not found.');
-    cal.getEvents(now, end).forEach(function(ev) {
+    cal.getEvents(weekStart, end).forEach(function(ev) {
       if (ev.getColor() !== '7') return;
       var start = ev.getStartTime();
       autoRows.push([
@@ -461,7 +484,7 @@ function syncTeamCalendar() {
   tab.getRange(1, 1, allRows.length, headers.length).setValues(allRows);
 
   // Invalidate cache so the next page load gets fresh data
-  try { CacheService.getScriptCache().remove('cal_data_v9'); } catch (e) {}
+  try { CacheService.getScriptCache().remove('cal_data_v10'); } catch (e) {}
 
   Logger.log('syncTeamCalendar: wrote ' + autoRows.length + ' auto + ' + manualRows.length + ' manual rows.');
 }
