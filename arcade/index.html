@@ -53,9 +53,9 @@
 
     .game-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(260px, 88vw), 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(240px, 88vw), 1fr));
       gap: 24px;
-      width: min(900px, 96vw);
+      width: min(1120px, 96vw);
     }
 
     .game-card {
@@ -78,6 +78,7 @@
     .game-card.racer:hover   { border-color: var(--yellow); box-shadow: 0 0 40px rgba(255,230,0,0.18); }
     .game-card.runner:hover  { border-color: var(--green);  box-shadow: 0 0 40px rgba(0,255,136,0.18); }
     .game-card.frogger:hover { border-color: var(--purple); box-shadow: 0 0 40px rgba(200,126,255,0.18); }
+    .game-card.trail:hover   { border-color: #ff9f00;       box-shadow: 0 0 40px rgba(255,159,0,0.22); }
 
     .game-icon {
       font-size: clamp(36px, 8vw, 56px);
@@ -94,6 +95,7 @@
     .game-card.racer  .game-name { color: var(--yellow); }
     .game-card.runner .game-name { color: var(--green); }
     .game-card.frogger .game-name { color: var(--purple); }
+    .game-card.trail  .game-name { color: #ff9f00; }
 
     .game-desc {
       font-size: clamp(6px, 1.5vw, 8px);
@@ -119,6 +121,7 @@
     .game-card.racer  .play-btn { color: var(--yellow); }
     .game-card.runner .play-btn { color: var(--green); }
     .game-card.frogger .play-btn { color: var(--purple); }
+    .game-card.trail  .play-btn { color: #ff9f00; }
 
     .game-card:hover .play-btn {
       background: currentColor;
@@ -170,6 +173,17 @@
         Deliver connection batches<br>
         to the Secure Server.<br>
         Dodge traffic. All 5 levels.
+      </div>
+      <div class="play-btn">▶ PLAY</div>
+    </a>
+
+    <a class="game-card trail" href="connection-trail/">
+      <span class="game-icon">🚐</span>
+      <div class="game-name">THE CONNECTION TRAIL</div>
+      <div class="game-desc">
+        60-second Oregon Trail run.<br>
+        Manage fleet health &amp; pacing.<br>
+        Survive crises. Hit 667K.
       </div>
       <div class="play-btn">▶ PLAY</div>
     </a>
