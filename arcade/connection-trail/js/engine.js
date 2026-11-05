@@ -98,8 +98,11 @@ const E = (() => {
   }
 
   function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Use actual rendered dimensions so road/car aren't clipped by HUD
+    canvas.width  = canvas.offsetWidth  || window.innerWidth;
+    canvas.height = canvas.offsetHeight || window.innerHeight;
+    if (canvas.width === 0) canvas.width = window.innerWidth;
+    if (canvas.height === 0) canvas.height = window.innerHeight;
     buildTerrain();
     buildStarField();
   }
@@ -202,7 +205,7 @@ const E = (() => {
   }
 
   function updateBoot(dt) {
-    // Handled via typed text in render; no dt logic needed
+    bootTimer += dt;
   }
 
   function updatePlaying(dt) {
@@ -587,9 +590,6 @@ const E = (() => {
   let bootLineTimer = 0;
 
   function renderBoot() {
-    bootTimer += 1 / 60;
-    bootLineTimer += 1 / 60;
-
     const el = $('boot-text');
     const linesShown = Math.min(BOOT_LINES.length, Math.floor(bootTimer * 4));
     el.innerHTML = BOOT_LINES.slice(0, linesShown).map(l =>
@@ -797,6 +797,8 @@ const E = (() => {
   function startGame() {
     $('start-screen').style.display = 'none';
     $('game-screen').classList.remove('hidden');
+    // Defer resize until game-screen is in layout flow
+    setTimeout(resize, 0);
     state.phase = 'playing';
     Audio.startEngineLoop();
     updateHUD();
@@ -835,6 +837,7 @@ const E = (() => {
 
     $('end-screen').classList.add('hidden');
     $('end-screen').style.display = 'none';
+    setTimeout(resize, 0);
     $('crisis-modal').classList.add('hidden');
     $('hunting-modal').classList.add('hidden');
     $('reboot-overlay').classList.add('hidden');

@@ -99,6 +99,8 @@ html, body {
   display: flex;
   flex-direction: column;
   position: fixed; inset: 0;
+  align-items: stretch;    /* override any inherited centering */
+  justify-content: flex-start;
 }
 #game-screen.hidden { display: none; }
 
@@ -107,45 +109,46 @@ html, body {
   flex-shrink: 0;
   background: #030e03;
   border-bottom: 2px solid var(--dim);
-  padding: 6px 16px;
+  padding: 4px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   z-index: 10;
+  width: 100%;
 }
 
 #hud-top {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
-  font-size: 20px;
+  font-size: 18px;
   text-shadow: 0 0 6px var(--green);
 }
 
 #hud-title {
   color: var(--amber);
   text-shadow: 0 0 10px var(--amber);
-  font-size: 22px;
+  font-size: 18px;
   flex: 1;
 }
 
-#hud-timer { color: var(--yellow); }
-#hud-date  { color: var(--green); }
+#hud-timer { color: var(--yellow); white-space: nowrap; }
+#hud-date  { color: var(--green);  white-space: nowrap; }
 
-/* Health row */
+/* Health + pacing on same row */
 #health-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 18px;
+  font-size: 17px;
 }
 
 #health-bar {
-  flex: 1; max-width: 200px;
-  height: 14px;
+  width: 140px;
+  flex-shrink: 0;
+  height: 12px;
   background: #001100;
   border: 1px solid var(--dim);
-  position: relative;
   overflow: hidden;
 }
 
@@ -156,28 +159,29 @@ html, body {
   box-shadow: 0 0 6px currentColor;
 }
 
-#health-pct { min-width: 44px; }
+#health-pct { min-width: 40px; }
 
-/* Pacing row */
+/* Pacing — inline after health */
 #pacing-row {
-  font-size: 18px;
-  display: flex; align-items: center; gap: 10px;
+  font-size: 17px;
+  display: flex; align-items: center; gap: 8px;
+  margin-left: auto;
 }
 
 #pacing-name {
-  font-size: 20px;
+  font-size: 18px;
   text-shadow: 0 0 10px currentColor;
   transition: color 0.2s;
 }
 
-.hint { color: var(--dim); font-size: 16px; }
+.hint { color: var(--dim); font-size: 14px; }
 
 /* Timeline bar */
 #timeline-row {
-  display: flex; align-items: center; gap: 8px; font-size: 16px;
+  display: flex; align-items: center; gap: 8px; font-size: 14px;
 }
 #timeline-bar {
-  flex: 1; height: 10px;
+  flex: 1; height: 8px;
   background: #001100;
   border: 1px solid var(--dim);
   position: relative;
@@ -189,19 +193,20 @@ html, body {
 }
 #timeline-marker {
   position: absolute; top: -4px;
-  width: 4px; height: 18px;
+  width: 4px; height: 16px;
   background: var(--amber);
   box-shadow: 0 0 6px var(--amber);
   transform: translateX(-50%);
   transition: left 0.3s;
 }
-.timeline-label { color: var(--dim); font-size: 15px; white-space: nowrap; }
+.timeline-label { color: var(--dim); font-size: 13px; white-space: nowrap; }
 
 /* ── Canvas ────────────────────────────────────────────────────── */
 #game-canvas {
-  flex: 1;
+  flex: 1 1 0;
   display: block;
   width: 100%;
+  min-height: 0;   /* allow flex shrink below content size */
   image-rendering: pixelated;
 }
 
@@ -210,25 +215,26 @@ html, body {
   flex-shrink: 0;
   background: #030e03;
   border-top: 2px solid var(--dim);
-  padding: 8px 16px;
+  padding: 5px 16px;
   display: flex;
-  gap: 32px;
+  gap: 24px;
   z-index: 10;
+  width: 100%;
 }
 
 .connection-meter {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 18px;
+  gap: 8px;
+  font-size: 17px;
 }
 
-.meter-label { color: var(--amber); min-width: 180px; white-space: nowrap; }
+.meter-label { color: var(--amber); min-width: 170px; white-space: nowrap; }
 
 .meter-bar {
   flex: 1;
-  height: 16px;
+  height: 14px;
   background: #001100;
   border: 1px solid var(--dim);
   overflow: hidden;
@@ -237,12 +243,11 @@ html, body {
 .meter-fill {
   height: 100%;
   transition: width 0.2s;
-  position: relative;
 }
 .meter-fill.gm   { background: var(--green); box-shadow: 0 0 6px var(--green); }
 .meter-fill.kddi { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
 
-.meter-values { white-space: nowrap; font-size: 17px; }
+.meter-values { white-space: nowrap; font-size: 16px; }
 .meter-values span:first-child { color: var(--green); }
 
 /* ── Modals ────────────────────────────────────────────────────── */
