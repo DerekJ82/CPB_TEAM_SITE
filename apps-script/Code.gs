@@ -1438,6 +1438,19 @@ function sendWeeklyTeamNote() {
 }
 
 // Run once from the Apps Script editor to install the weekly Monday 8 AM PT trigger.
+function setupDailyCalendarSyncTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'syncTeamCalendar') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('syncTeamCalendar')
+    .timeBased()
+    .everyDays(1)
+    .atHour(7)
+    .inTimezone('America/Vancouver')
+    .create();
+  Logger.log('setupDailyCalendarSyncTrigger: daily 7 AM PT trigger installed.');
+}
+
 function setupWeeklyTeamNoteTrigger() {
   ScriptApp.getProjectTriggers().forEach(function(t) {
     if (t.getHandlerFunction() === 'sendWeeklyTeamNote') ScriptApp.deleteTrigger(t);
