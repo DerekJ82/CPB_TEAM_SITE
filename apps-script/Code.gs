@@ -1446,7 +1446,6 @@ function setupDailyCalendarSyncTrigger() {
     .timeBased()
     .everyDays(1)
     .atHour(7)
-    .inTimezone('America/Vancouver')
     .create();
   Logger.log('setupDailyCalendarSyncTrigger: daily 7 AM PT trigger installed.');
 }
