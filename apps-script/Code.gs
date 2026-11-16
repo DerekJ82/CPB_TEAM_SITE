@@ -1313,7 +1313,6 @@ var _WEEKLY_FUN_FACTS = {
 
 // Canadian observances keyed by "month-weekOfMonth". Returns a string or null.
 var _CANADIAN_OBSERVANCES = {
-  '1-4':  '🔔 *Bell Let\'s Talk week* — Canada\'s largest corporate mental health initiative. Share, listen, and help end stigma. 💙',
   '2-1':  '✊ *Black History Month* begins! Celebrating the achievements and resilience of Black Canadians all February long.',
   '3-2':  '♀️ *International Women\'s Day* is this week (March 8) — celebrating the women who make CPB and Canada extraordinary.',
   '4-3':  '🤝 *National Volunteer Week* — recognizing Canadians who give their time to make communities stronger.',
