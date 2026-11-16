@@ -38,6 +38,13 @@ function include(filename) {
 
 var MEETINGS = [
   {
+    id: 'november-2026',
+    title: 'November Team Meeting',
+    date: 'November 24, 2026',
+    description: 'Toronto meeting: land acknowledgement, Angie\'s presentation, key dates & budget milestones, and a cross-site scavenger hunt.',
+    file: 'meeting-november-2026'
+  },
+  {
     id: 'july-2026',
     title: 'July Team Meeting',
     date: 'July 2026',
