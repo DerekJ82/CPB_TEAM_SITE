@@ -1115,6 +1115,81 @@ function _brQueriesDeleteTriggersFor(funcName) {
 }
 
 
+// ─── Security Awareness Training Webhook ─────────────────────────────────────
+// sendDailySATNudge(): fires each morning via a time-based trigger and posts
+// a rotating reminder to the Planny chat space until the Nov 24 deadline.
+//
+// Setup (run once from the Apps Script editor):
+//   setupDailySATTrigger()
+
+var _SAT_DEADLINE_UTC = new Date('2026-11-25T07:59:59Z'); // Nov 24 11:59 PM PST
+
+var _SAT_NUDGES = [
+  '🔐 Good morning, CPB! Your TELUS Security Awareness Training is due *Nov 24* — shorter than you think and 100% required. Go get it done!',
+  '🛡️ Friendly reminder: Security Awareness Training isn\'t optional — but it IS short. Knock it out today before the Nov 24 deadline. Future-you will thank you.',
+  '🎣 Fun fact: phishing attacks account for 90% of data breaches. Less fun fact: your SAT is still waiting for you. Due *Nov 24*. Go.',
+  '🔒 Your laptop is locked. Your badge requires a PIN. Your Security Awareness Training... still not done? Fix that before *Nov 24*.',
+  '🤖 This is an automated reminder that humans still need to do non-automated things. Like Security Awareness Training. Due *Nov 24*.',
+  '📧 You got this far reading a chat message — you clearly have a few minutes. Use them on your Security Awareness Training. Deadline: *Nov 24*.',
+  '🧠 Cybersecurity tip: the best defence is a trained team. The second best is not clicking sketchy links. Both start with your SAT. Due *Nov 24*.',
+  '⏳ The Nov 24 SAT deadline is closer than it looks. Don\'t be the reason Derek sends a follow-up email. Complete your training today.',
+  '🚨 Security Awareness Training status check: if you haven\'t done it, today\'s a great day. Deadline: *Monday, Nov 24*. Clock\'s ticking.',
+  '🏁 Final stretch on Security Awareness Training! If you\'ve finished — legend. If not — *Nov 24* is the deadline. Right now is a great time.'
+];
+
+function _satTimeRemaining(now) {
+  var diff = _SAT_DEADLINE_UTC - now;
+  var days = Math.floor(diff / 86400000);
+  var hrs  = Math.floor((diff % 86400000) / 3600000);
+  if (days > 1) return days + ' days left.';
+  if (days === 1) return '1 day left.';
+  if (hrs > 1)  return hrs + ' hours left — go NOW!';
+  return 'Last chance — do it NOW!';
+}
+
+function sendDailySATNudge() {
+  var now = new Date();
+  if (now >= _SAT_DEADLINE_UTC) {
+    Logger.log('sendDailySATNudge: past deadline — skipping.');
+    return;
+  }
+
+  var props = PropertiesService.getScriptProperties();
+  var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
+  if (!url) {
+    Logger.log('sendDailySATNudge: no CHAT_WEBHOOK_URL_PLANNY — skipped.');
+    return;
+  }
+
+  var dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  var msg = _SAT_NUDGES[dayOfYear % _SAT_NUDGES.length] + ' ' + _satTimeRemaining(now);
+
+  try {
+    var resp = UrlFetchApp.fetch(url, {
+      method: 'post',
+      contentType: 'application/json',
+      muteHttpExceptions: true,
+      payload: JSON.stringify({ text: msg })
+    });
+    Logger.log('sendDailySATNudge: HTTP ' + resp.getResponseCode());
+  } catch (e) {
+    Logger.log('sendDailySATNudge error: ' + e);
+  }
+}
+
+function setupDailySATTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendDailySATNudge') ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger('sendDailySATNudge')
+    .timeBased()
+    .everyDays(1)
+    .atHour(9)
+    .create();
+  Logger.log('setupDailySATTrigger: daily 9 AM PT trigger installed.');
+}
+
+
 // ─── Service Anniversary Notifications ───────────────────────────────────────
 // sendAnniversaryNudges(): runs daily at 8 AM PST. Checks if any team member's
 // TELUS service anniversary is tomorrow; if so, posts a celebration message to
