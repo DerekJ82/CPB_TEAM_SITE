@@ -705,6 +705,11 @@ a{color:var(--purple)}
 .cal-card-empty,.cal-card-error{background:rgba(75,40,109,.03)}
 .cal-card-empty p,.cal-card-error p{font-size:13px;color:var(--grey);margin:0}
 @media(max-width:600px){.cal-cards{grid-template-columns:1fr}}
+.cal-card--observance{background:linear-gradient(135deg,rgba(75,40,109,.06),rgba(75,40,109,.02));border-color:rgba(75,40,109,.25);min-height:80px}
+.cal-card--observance:hover{border-color:var(--purple)}
+.cal-card--observance .cal-card-title{color:var(--purple)}
+.cal-card-obs-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);opacity:.55;margin-bottom:4px}
+.cal-period-banner{background:linear-gradient(90deg,rgba(75,40,109,.09),transparent);border-left:3px solid var(--purple);border-radius:0 6px 6px 0;padding:7px 14px;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:12px}
 
 /* ─── PulseCheck Countdown ─────────────────────────────────────────────────── */
 .pc-countdown{text-align:center;margin-bottom:clamp(28px,3.5vw,44px);

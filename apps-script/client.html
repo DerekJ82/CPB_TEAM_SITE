@@ -2012,6 +2012,48 @@ function initRosterMap() {
       .replace(/"/g, '&quot;');
   }
 
+  // Returns specific-day observances and period overlays for a given year.
+  function _caObservancesForYear(year) {
+    function nthWeekday(y, m, wd, n) {
+      var d = new Date(y, m, 1), delta = (wd - d.getDay() + 7) % 7;
+      d.setDate(1 + delta + (n - 1) * 7); return d;
+    }
+    function fmt(m, d) { return year + '-' + (m<10?'0':'')+m + '-' + (d<10?'0':'')+d; }
+    function toYMD(d) { return fmt(d.getMonth()+1, d.getDate()); }
+    var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    function mdy(d) { return MONTHS[d.getMonth()] + ' ' + d.getDate(); }
+
+    var labourDay    = nthWeekday(year, 8, 1, 1); // 1st Mon of Sep
+    var thanksgiving = nthWeekday(year, 9, 1, 2); // 2nd Mon of Oct
+    var victoriaDay  = (function() {
+      var d = new Date(year, 4, 25);
+      while (d.getDay() !== 1) d.setDate(d.getDate() - 1); return d;
+    })();
+
+    return {
+      days: [
+        { date: fmt(3,8),           title: 'International Women\'s Day', emoji: '♀️',  label: 'March 8' },
+        { date: fmt(4,22),          title: 'Earth Day',                  emoji: '🌍', label: 'April 22' },
+        { date: fmt(6,21),          title: 'National Indigenous Peoples Day', emoji: '🪶', label: 'June 21' },
+        { date: fmt(7,1),           title: 'Canada Day',                 emoji: '🇨🇦', label: 'July 1' },
+        { date: toYMD(victoriaDay), title: 'Victoria Day',               emoji: '🌷', label: mdy(victoriaDay) },
+        { date: toYMD(labourDay),   title: 'Labour Day',                 emoji: '👷', label: mdy(labourDay) },
+        { date: toYMD(thanksgiving),title: 'Thanksgiving',               emoji: '🦃', label: mdy(thanksgiving) },
+        { date: fmt(11,11),         title: 'Remembrance Day',            emoji: '🌺', label: 'November 11' }
+      ],
+      periods: [
+        { label: 'Black History Month',              emoji: '✊',     start: fmt(2,1),   end: fmt(2,28) },
+        { label: 'National Volunteer Week',          emoji: '🤝',     start: fmt(4,20),  end: fmt(4,26) },
+        { label: 'Mental Health Week',               emoji: '💚',     start: fmt(5,4),   end: fmt(5,10) },
+        { label: 'Pride Month',                      emoji: '🏳️‍🌈',    start: fmt(6,1),   end: fmt(6,30) },
+        { label: 'National Indigenous History Month',emoji: '🪶',     start: fmt(6,1),   end: fmt(6,30) },
+        { label: 'Mental Illness Awareness Week',    emoji: '🧡',     start: fmt(10,4),  end: fmt(10,10) },
+        { label: 'Movember',                         emoji: '👨',     start: fmt(11,1),  end: fmt(11,30) },
+        { label: 'Trans Awareness Week',             emoji: '🏳️‍⚧️',    start: fmt(11,13), end: fmt(11,19) }
+      ]
+    };
+  }
+
   function renderCalendar(data) {
     var container = document.getElementById('cal-events-container');
     if (!container) return;
@@ -2024,11 +2066,6 @@ function initRosterMap() {
         '<p>' + esc(calError) + ' — re-authorize the web app in Apps Script (Deploy &rarr; Manage deployments).</p></div>';
       return;
     }
-    if (!events.length) {
-      container.innerHTML = '<div class="cal-card-empty"><span class="eyebrow">No upcoming events</span>' +
-        '<p>No team events in the next 90 days. Add rows to the Team Calendar sheet or run syncTeamCalendar().</p></div>';
-      return;
-    }
 
     // Compute week boundaries (Monday-based) as yyyy-MM-dd strings
     function toYMD(d) {
@@ -2036,6 +2073,25 @@ function initRosterMap() {
       return y + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
     }
     var today = new Date(); today.setHours(0, 0, 0, 0);
+    var todayYMD = toYMD(today);
+
+    // Inject specific-day Canadian observances into the event list
+    (function() {
+      var days = _caObservancesForYear(today.getFullYear()).days;
+      if (today.getMonth() >= 10) days = days.concat(_caObservancesForYear(today.getFullYear() + 1).days);
+      days.forEach(function(o) {
+        if (o.date < todayYMD) return;
+        events.push({ date: o.date, dateLabel: o.emoji + ' ' + o.label, title: o.title, time: '', type: 'observance', isPast: false, isObservance: true });
+      });
+      events.sort(function(a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+    })();
+
+    if (!events.length) {
+      container.innerHTML = '<div class="cal-card-empty"><span class="eyebrow">No upcoming events</span>' +
+        '<p>No team events in the next 90 days. Add rows to the Team Calendar sheet or run syncTeamCalendar().</p></div>';
+      return;
+    }
+
     var dow = today.getDay();
     var thisMonday = new Date(today); thisMonday.setDate(today.getDate() + (dow === 0 ? -6 : 1 - dow));
     var nextMonday = new Date(thisMonday); nextMonday.setDate(thisMonday.getDate() + 7);
@@ -2060,9 +2116,34 @@ function initRosterMap() {
       groupBuckets[lbl].push(e);
     });
 
+    // Determine which period overlays apply to each group
+    var allPeriods = _caObservancesForYear(today.getFullYear()).periods;
+    if (today.getMonth() >= 10) allPeriods = allPeriods.concat(_caObservancesForYear(today.getFullYear() + 1).periods);
+    function getGroupPeriods(lbl) {
+      var gs, ge;
+      if (lbl === 'This Week') {
+        gs = thisMondayStr; ge = toYMD(new Date(thisMonday.getTime() + 6 * 86400000));
+      } else if (lbl === 'Next Week') {
+        gs = nextMondayStr; ge = toYMD(new Date(nextMonday.getTime() + 6 * 86400000));
+      } else {
+        var parts = lbl.split(' '), mi = MONTHS.indexOf(parts[0]), yr = parseInt(parts[1], 10);
+        if (mi < 0 || isNaN(yr)) return [];
+        gs = yr + '-' + (mi+1<10?'0':'')+(mi+1) + '-01';
+        ge = yr + '-' + (mi+1<10?'0':'')+(mi+1) + '-' + new Date(yr, mi+1, 0).getDate();
+      }
+      return allPeriods.filter(function(p) { return p.start <= ge && p.end >= gs; });
+    }
+
     var typeCls = { 'team calendar': 'info', meeting: 'info', deadline: 'bad', milestone: 'warn', event: 'ok' };
 
     function cardHtml(e) {
+      if (e.isObservance) {
+        return '<div class="cal-card cal-card--observance">' +
+          '<div class="cal-card-obs-label">Canadian Observance</div>' +
+          '<h4 class="cal-card-title">' + esc(e.title || '') + '</h4>' +
+          '<div class="cal-card-datetime">' + esc(e.dateLabel || e.date || '') + '</div>' +
+          '</div>';
+      }
       var t        = (e.type || 'event').toLowerCase();
       var cls      = typeCls[t] || 'ok';
       var lbl      = e.type || 'Event';
@@ -2076,7 +2157,12 @@ function initRosterMap() {
     }
 
     container.innerHTML = groupOrder.map(function(lbl) {
+      var periods = getGroupPeriods(lbl);
+      var banners = periods.map(function(p) {
+        return '<div class="cal-period-banner">' + p.emoji + ' ' + esc(p.label) + '</div>';
+      }).join('');
       return '<div class="cal-group-hd">' + esc(lbl) + '</div>' +
+        banners +
         '<div class="cal-cards">' + groupBuckets[lbl].map(cardHtml).join('') + '</div>';
     }).join('');
   }
