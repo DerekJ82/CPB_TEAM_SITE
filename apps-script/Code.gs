@@ -4,6 +4,33 @@ function doGet(e) {
   var meetingId = e && e.parameter && e.parameter.meeting;
 
   if (meetingId) {
+    var resolvedId = (!meetingId || meetingId === 'current') ? MEETINGS[0].id : meetingId;
+    var isCurrentMeeting = (resolvedId === MEETINGS[0].id);
+
+    if (isCurrentMeeting) {
+      var CURRENT_ALLOWED = ['derek.johnson@telus.com'];
+      var userEmail = (Session.getActiveUser().getEmail() || '').toLowerCase();
+      if (CURRENT_ALLOWED.indexOf(userEmail) === -1) {
+        return HtmlService.createHtmlOutput(
+          '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+          '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+          '<title>Access Restricted</title>' +
+          '<style>body{margin:0;font-family:"Helvetica Neue",Arial,sans-serif;background:#0a0a1e;' +
+          'display:flex;align-items:center;justify-content:center;min-height:100vh;color:#fff;}' +
+          '.box{text-align:center;padding:48px 32px;max-width:420px;}' +
+          '.icon{font-size:48px;margin-bottom:20px;}' +
+          'h1{font-size:24px;font-weight:900;letter-spacing:-.02em;margin:0 0 12px;}' +
+          'p{font-size:14px;line-height:1.6;color:rgba(255,255,255,.6);margin:0;}' +
+          '</style></head><body>' +
+          '<div class="box"><div class="icon">🔒</div>' +
+          '<h1>Not yet available</h1>' +
+          '<p>This meeting page will be accessible to the full team after the session wraps up.</p>' +
+          '</div></body></html>'
+        ).setTitle('Access Restricted')
+         .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+      }
+    }
+
     var file = _getMeetingFile(meetingId);
     var tpl = HtmlService.createTemplateFromFile(file);
     tpl.execUrl = ScriptApp.getService().getUrl();
