@@ -245,68 +245,51 @@
     }
     .btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
 
-    /* ── Scavenger Hunt ───────────────────────────────── */
-    .hunt-top {
-      display: flex; align-items: flex-start; justify-content: space-between;
-      gap: 20px; flex-wrap: wrap; margin-bottom: 24px;
+    /* ── Menti launch card ───────────────────────────────── */
+    .menti-card {
+      background: linear-gradient(135deg, var(--ink), #3B2454);
+      border-radius: 20px; padding: clamp(32px,4vw,54px);
+      display: grid; grid-template-columns: auto 1fr;
+      gap: clamp(32px,4vw,56px); align-items: start;
     }
-    .hunt-progress-wrap { margin-top: 6px; }
-    .hunt-bar-track { background: var(--line); border-radius: 100px; height: 8px; overflow: hidden; width: 220px; margin-bottom: 6px; }
-    .hunt-bar-fill { height: 100%; background: var(--green); border-radius: 100px; width: 0%; transition: width .5s cubic-bezier(.2,0,0,1); }
-    .hunt-label { font-size: 12px; font-weight: 700; color: var(--grey-l); }
-    .host-btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      font-size: 12px; font-weight: 700; padding: 9px 18px; border-radius: 100px;
-      background: #fff; color: var(--grey); border: 1.5px solid var(--line-d);
-      cursor: pointer; font-family: var(--font); white-space: nowrap;
-      transition: border-color .2s, color .2s, background .2s;
+    @media(max-width:680px) { .menti-card { grid-template-columns: 1fr; } }
+    .menti-eyebrow {
+      font-size: 11px; font-weight: 500; letter-spacing: .18em;
+      text-transform: uppercase; color: var(--lime); margin-bottom: 10px;
     }
-    .host-btn:hover { border-color: var(--purple); color: var(--purple); }
-    .host-btn.on { background: var(--purple); color: #fff; border-color: var(--purple); }
-
-    .clue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    @media(max-width:720px) { .clue-grid { grid-template-columns: 1fr; } }
-
-    .clue-card {
-      background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--line-d);
-      border-radius: 10px; padding: 22px 24px;
-      display: flex; flex-direction: column; gap: 12px;
-      transition: border-top-color .2s, transform .2s, box-shadow .2s;
+    .menti-url {
+      font-size: clamp(26px,3.6vw,42px); font-weight: 900; line-height: 1;
+      letter-spacing: -.03em; color: #fff; margin-bottom: 10px;
     }
-    .clue-card:hover:not(.solved) { border-top-color: var(--purple); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(42,26,62,.07); }
-    .clue-card.solved { border-top-color: var(--green); background: #f6fff0; border-color: rgba(102,204,0,.22); }
-
-    .clue-site {
+    .menti-code {
+      font-size: clamp(30px,4.5vw,54px); font-weight: 900; letter-spacing: .1em;
+      color: var(--lime); line-height: 1; margin-bottom: 24px; font-variant-numeric: tabular-nums;
+    }
+    .qr-box {
+      width: 120px; height: 120px; border-radius: 10px;
+      background: rgba(255,255,255,.08); border: 1.5px dashed rgba(255,255,255,.25);
+      display: grid; place-items: center; text-align: center;
+      font-size: 11px; color: rgba(255,255,255,.35); font-weight: 600;
+      letter-spacing: .04em; line-height: 1.4; margin-bottom: 7px;
+    }
+    .qr-label { font-size: 11px; color: rgba(255,255,255,.38); font-weight: 500; }
+    .menti-rules-head {
+      font-size: clamp(19px,2.2vw,26px); font-weight: 900; letter-spacing: -.022em;
+      color: #fff; margin: 0 0 16px;
+    }
+    .menti-rule-list {
+      margin: 0 0 22px; padding-left: 20px;
+      color: rgba(255,255,255,.75); font-size: clamp(14px,1.3vw,15.5px); line-height: 1.65;
+    }
+    .menti-rule-list li { margin-bottom: 8px; }
+    .menti-sites { display: flex; gap: 10px; flex-wrap: wrap; }
+    .menti-site-pill {
       display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-      padding: 4px 11px; border-radius: 100px; align-self: flex-start;
+      font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: 5px 13px; border-radius: 100px;
     }
-    .site-team { background: var(--tint2); color: var(--purple); }
-    .site-hub  { background: #EAF7F4; color: #2a7868; }
-
-    .clue-text { font-size: 14px; line-height: 1.6; color: var(--ink); flex: 1; }
-
-    .clue-input-row { display: flex; align-items: center; gap: 8px; }
-    .clue-input {
-      flex: 1; padding: 9px 12px; background: var(--tint);
-      border: 1.5px solid var(--line-d); border-radius: 8px;
-      font-family: var(--font); font-size: 14px; color: var(--ink);
-      outline: none; transition: border-color .2s, background .2s;
-    }
-    .clue-input:focus { border-color: var(--purple); background: #fff; }
-    .clue-input.correct { border-color: var(--green); background: #f0ffe8; color: #2d6a00; font-weight: 700; }
-    .clue-input::placeholder { color: var(--grey-l); }
-    .clue-check { font-size: 18px; display: none; flex-shrink: 0; }
-    .clue-check.show { display: block; }
-
-    .clue-reveal {
-      display: none; padding: 12px 14px; border-radius: 8px;
-      background: var(--tint2); border-left: 3px solid var(--purple);
-    }
-    .clue-reveal.show { display: block; }
-    .clue-reveal .ans-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--grey-l); margin-bottom: 4px; }
-    .clue-reveal .ans-val   { font-size: 14px; font-weight: 700; color: var(--purple); margin-bottom: 3px; }
-    .clue-reveal .ans-hint  { font-size: 12px; color: var(--grey); font-style: italic; }
+    .site-team { background: rgba(99,57,139,.4);  color: #c8a4e0; border: 1px solid rgba(99,57,139,.55); }
+    .site-hub  { background: rgba(42,120,104,.35); color: #76d7c4; border: 1px solid rgba(42,120,104,.45); }
 
     /* ── Notes floating button ────────────────────────── */
     #notes-fab {
@@ -619,25 +602,33 @@
 <!-- ══ SCAVENGER HUNT ════════════════════════════════════ -->
 <section class="sect" id="hunt">
   <div class="pad">
-    <div class="hunt-top reveal">
+    <div class="sect-head reveal">
+      <span class="eyebrow">Virtual Challenge &nbsp;·&nbsp; Mentimeter</span>
+      <h2 class="h3">Cross-site scavenger hunt.</h2>
+      <p class="sect-sub">8 clues across the CPB Team Site &amp; CPB HUB — fastest accurate answers win</p>
+    </div>
+    <div class="menti-card reveal">
       <div>
-        <span class="eyebrow" style="display:block;margin-bottom:8px;">Cross-Site Challenge</span>
-        <h2 class="h3" style="margin-bottom:0;">Scavenger hunt.</h2>
+        <div class="menti-eyebrow">Join the game</div>
+        <div class="menti-url">menti.com</div>
+        <div class="menti-code">[XXXX XXXX]</div>
+        <div class="qr-box">QR Code<br>goes here</div>
+        <div class="qr-label">Or scan to join</div>
       </div>
       <div>
-        <button class="host-btn" id="hostBtn" onclick="toggleHostMode()">
-          🔑 Host Mode: Reveal Answers
-        </button>
-        <div class="hunt-progress-wrap">
-          <div class="hunt-bar-track"><div class="hunt-bar-fill" id="huntBar"></div></div>
-          <div class="hunt-label"><span id="foundCount">0</span> of 8 clues found</div>
+        <h3 class="menti-rules-head">How to play</h3>
+        <ol class="menti-rule-list">
+          <li>Open the CPB Team Site and CPB HUB in separate tabs before we start</li>
+          <li>Search both sites to find each answer before the timer runs out</li>
+          <li>Type your answer directly in Mentimeter — fastest correct answer scores the most</li>
+          <li>8 clues total · 60 seconds for multiple choice · 90 seconds for free-text</li>
+        </ol>
+        <div class="menti-sites">
+          <span class="menti-site-pill site-team">🏠 CPB Team Site</span>
+          <span class="menti-site-pill site-hub">🔭 CPB HUB</span>
         </div>
       </div>
     </div>
-    <p class="reveal" style="font-size:14px;line-height:1.6;color:var(--grey);margin:0 0 24px;max-width:72ch;">
-      Explore the <strong style="color:var(--purple);">CPB Team Site</strong> and the <strong style="color:#2a7868;">CPB HUB</strong> to find the answers. Type your answer to check instantly — no submit button needed.
-    </p>
-    <div class="clue-grid reveal" id="clueGrid"></div>
   </div>
 </section>
 
@@ -742,64 +733,6 @@
   function esc(s){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(s))); return d.innerHTML; }
   document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeArchive(); closeNotes(); } });
 
-  /* ── Scavenger Hunt ───────────────────────────── */
-  var CLUES = [
-    { site:'team', label:'🏠 CPB Team Site', text:'Under the "Playground" section of the CPB Team Site, what is the name of the tab where you can play games?',              accepted:['arcade'],                              display:'Arcade',               hint:'Playground section → second tab in the navigation bar' },
-    { site:'team', label:'🏠 CPB Team Site', text:'The "Team" section of the CPB Team Site has three tabs. What is the name of the tab dedicated to our non-human colleagues?', accepted:['furry friends'],                        display:'Furry Friends',         hint:'Team section → third tab in the navigation bar' },
-    { site:'team', label:'🏠 CPB Team Site', text:'In the Pipelines section, what is the exact label of the tab for looking up billing queries?',                               accepted:['billed revenue queries'],               display:'Billed Revenue Queries', hint:'Pipelines section → first tab in the navigation bar' },
-    { site:'team', label:'🏠 CPB Team Site', text:'How many sections are listed on the CPB Team Site\'s main section-picker screen (the grid of cards on the home screen)?',    accepted:['6','six'],                             display:'6',                     hint:'Go to the CPB Team Site home screen and count the section cards' },
-    { site:'hub',  label:'🔭 CPB HUB',       text:'What is the subtitle displayed directly below the "Financial and KPI Hub" heading on the CPB HUB main portal page?',          accepted:['performance portal'],                   display:'Performance Portal',    hint:'CPB HUB main page → look below the large heading' },
-    { site:'hub',  label:'🔭 CPB HUB',       text:'In the CPB Level column of CPB HUB, which dashboard card has the subtitle "CPB Contribution Sankey"?',                         accepted:['ebitda flow'],                         display:'EBITDA Flow',           hint:'CPB HUB → CPB Level card grid → check card subtitles' },
-    { site:'hub',  label:'🔭 CPB HUB',       text:'What is the name of the "Coming Soon" card in the TBS Level section of CPB HUB?',                                              accepted:['sovereign ai factory'],                display:'Sovereign AI Factory',  hint:'CPB HUB → TBS Level card grid → find the greyed-out card' },
-    { site:'hub',  label:'🔭 CPB HUB',       text:'What two words appear as the label at the very start of the scrolling ticker bar at the bottom of CPB HUB?',                   accepted:['daily flash','daily flash (subscribers)'], display:'DAILY FLASH',       hint:'CPB HUB → bottom fixed ticker bar → read the left label' }
-  ];
-
-  var foundCount = 0, hostMode = false;
-  var solved = new Array(CLUES.length).fill(false);
-
-  (function buildClues(){
-    var grid = document.getElementById('clueGrid');
-    CLUES.forEach(function(clue, i){
-      var card = document.createElement('div');
-      card.className = 'clue-card'; card.id = 'cc'+i;
-      var sc = clue.site === 'team' ? 'site-team' : 'site-hub';
-      card.innerHTML =
-        '<span class="clue-site '+sc+'">'+clue.label+'</span>'+
-        '<p class="clue-text">'+esc(clue.text)+'</p>'+
-        '<div class="clue-input-row">'+
-          '<input class="clue-input" id="ci'+i+'" type="text" placeholder="Your answer…" oninput="checkInput('+i+')" autocomplete="off" spellcheck="false">'+
-          '<span class="clue-check" id="ck'+i+'">✅</span>'+
-        '</div>'+
-        '<div class="clue-reveal" id="cr'+i+'">'+
-          '<div class="ans-label">Answer</div>'+
-          '<div class="ans-val">'+esc(clue.display)+'</div>'+
-          '<div class="ans-hint">'+esc(clue.hint)+'</div>'+
-        '</div>';
-      grid.appendChild(card);
-    });
-  })();
-
-  function checkInput(i){
-    if(solved[i]) return;
-    var inp = document.getElementById('ci'+i);
-    var val = inp.value.trim().toLowerCase();
-    if(CLUES[i].accepted.some(function(a){ return val === a.toLowerCase(); })){
-      solved[i] = true; foundCount++;
-      inp.classList.add('correct'); inp.readOnly = true;
-      document.getElementById('ck'+i).classList.add('show');
-      document.getElementById('cc'+i).classList.add('solved');
-      document.getElementById('foundCount').textContent = foundCount;
-      document.getElementById('huntBar').style.width = (foundCount / CLUES.length * 100) + '%';
-    }
-  }
-
-  function toggleHostMode(){
-    hostMode = !hostMode;
-    var btn = document.getElementById('hostBtn');
-    btn.classList.toggle('on', hostMode);
-    btn.textContent = hostMode ? '🔒 Host Mode: Hide Answers' : '🔑 Host Mode: Reveal Answers';
-    document.querySelectorAll('.clue-reveal').forEach(function(el){ el.classList.toggle('show', hostMode); });
-  }
 </script>
 </body>
 </html>
