@@ -8,9 +8,10 @@ function doGet(e) {
     var isCurrentMeeting = (resolvedId === MEETINGS[0].id);
 
     if (isCurrentMeeting) {
+      var isReleased = PropertiesService.getScriptProperties().getProperty('NOVEMBER_2026_RELEASED') === 'true';
       var CURRENT_ALLOWED = ['derek.johnson@telus.com'];
       var userEmail = (Session.getActiveUser().getEmail() || '').toLowerCase();
-      if (CURRENT_ALLOWED.indexOf(userEmail) === -1) {
+      if (!isReleased && CURRENT_ALLOWED.indexOf(userEmail) === -1) {
         return HtmlService.createHtmlOutput(
           '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
           '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -104,6 +105,26 @@ function _getMeetingFile(meetingId) {
 
 function getMeetingsManifest() {
   return MEETINGS;
+}
+
+// Run once from the Apps Script editor to schedule the Nov 25 access release.
+function createNovemberReleaseTrigger() {
+  ScriptApp.newTrigger('releaseNovemberMeeting')
+    .timeBased()
+    .at(new Date(2026, 10, 25, 0, 5)) // Nov 25, 2026 at 00:05 script timezone
+    .create();
+  Logger.log('Trigger created: releaseNovemberMeeting will fire Nov 25 2026 at 00:05');
+}
+
+function releaseNovemberMeeting() {
+  PropertiesService.getScriptProperties().setProperty('NOVEMBER_2026_RELEASED', 'true');
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'releaseNovemberMeeting') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  Logger.log('November 2026 meeting released to all site users.');
 }
 
 function saveNoteToSheet(section, noteText) {
