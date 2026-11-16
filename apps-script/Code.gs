@@ -1235,6 +1235,111 @@ function setupAnniversaryTrigger() {
 
 var _WEEK_DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+// Rotating Canadian/seasonal fun facts, one array per month.
+var _WEEKLY_FUN_FACTS = {
+  1:  [
+    '🍁 Fun fact: Canada has more lakes than the rest of the world combined — over 2 million of them!',
+    '❄️ Canada\'s coldest recorded temperature was −63°C in Snag, Yukon (February 1947). Today feels tropical by comparison.',
+    '🏒 Hockey was first played indoors in Montreal in 1875. Canada\'s greatest contribution to civilization? Debatable. Top 3 for sure.',
+    '☕ January tip: the proper Canadian response to any temperature below −20°C is simply "not too bad."'
+  ],
+  2:  [
+    '✊ February is *Black History Month* in Canada — celebrating the extraordinary contributions of Black Canadians throughout our history.',
+    '🎅 Fun fact: Canada Post gave Santa his own postal code — H0H 0H0. It\'s a real, working address. He writes back every year.',
+    '🏔️ Canada is the second-largest country in the world by area, covering nearly 10 million square kilometres.',
+    '🦫 The beaver became Canada\'s official national animal in 1975. Excellent project managers — always building, never stopping.'
+  ],
+  3:  [
+    '🌸 Spring is (theoretically) on the way. Somewhere under all that snow, the tulips are thinking about it.',
+    '🫙 Canada produces about 71% of the world\'s pure maple syrup. Quebec alone accounts for most of it.',
+    '♀️ Fun fact: Canada was the first country to adopt multiculturalism as an official policy, back in 1971.',
+    '🌍 International Women\'s Day is March 8 — celebrating the people who make CPB and Canada extraordinary.'
+  ],
+  4:  [
+    '🌱 *National Volunteer Week* is this month — some of Canada\'s most important work is done without a paycheque.',
+    '🌎 *Earth Day* is April 22. Canada has 46 national parks protecting 328,198 km² of land. That\'s a lot of wilderness.',
+    '🍁 Canada\'s national motto is *A Mari Usque ad Mare* — "From Sea to Sea." With three ocean coastlines, we really meant it.',
+    '🐻 Canada is home to about 25,000 polar bears — roughly 60% of the world\'s entire population.'
+  ],
+  5:  [
+    '💚 *Mental Health Week* is in May — a great reminder to check in on each other. CPB looks after its own.',
+    '🌏 May is *Asian Heritage Month* — celebrating the history and contributions of Canadians of Asian descent.',
+    '🌷 Every year Ottawa\'s Canadian Tulip Festival blooms with over a million tulips, honouring Canada\'s friendship with the Netherlands.',
+    '🦅 *O Canada* was first performed in 1880 — but didn\'t become the official anthem until exactly 100 years later in 1980.'
+  ],
+  6:  [
+    '🏳️‍🌈 *Pride Month* — Canada was the fourth country in the world to legalize same-sex marriage nationwide, in 2005.',
+    '🪶 June is *National Indigenous History Month* — honouring the heritage and cultures of First Nations, Métis, and Inuit peoples.',
+    '🌞 Canada has six time zones — including Newfoundland, which is offset by 30 minutes. Newfoundland does things its own way.',
+    '☀️ Inuvik, NWT gets nearly 24 hours of sunlight around the summer solstice. Blackout curtains: essential.'
+  ],
+  7:  [
+    '🎉 Canada turned ' + (new Date().getFullYear() - 1867) + ' on July 1st! Not bad for a country that invented insulin, the Canadarm, and poutine.',
+    '🌊 Canada has the longest coastline in the world — over 202,000 km. That\'s long enough to circle the Earth more than five times.',
+    '🏕️ July is peak camping season. From BC\'s rainforests to PEI\'s red-sand beaches — this country really has it all.',
+    '🦌 Wood Buffalo National Park is home to the world\'s largest free-roaming bison herd — over 10,000 animals.'
+  ],
+  8:  [
+    '☀️ Winnipeg gets more sunshine hours in summer than any other major Canadian city. Prairie summers are seriously underrated.',
+    '🌾 Canada is one of the world\'s top 5 agricultural exporters. Harvest season is almost here. 🚜',
+    '🏄 Tofino, BC is Canada\'s surfing capital. Yes, Canadians surf. In wetsuits. It\'s very Canadian.',
+    '🫐 Canada produces about 40% of the world\'s wild blueberries. Nova Scotia harvests thousands of tonnes each summer.'
+  ],
+  9:  [
+    '🍂 Autumn is arriving — arguably Canada\'s most beautiful season, especially when the maple leaves turn. 🍁',
+    '👷 *Labour Day* has been a Canadian tradition since 1894. The first Labour Day parade was held in Toronto in 1872.',
+    '🎒 Canada consistently ranks among the top countries in the world for post-secondary education attainment.',
+    '🌲 Canada\'s boreal forest is the largest intact forest ecosystem on Earth — 552 million hectares.'
+  ],
+  10: [
+    '🧡 *Mental Illness Awareness Week* is in early October — checking in on teammates is always on the agenda. 💚',
+    '🦃 Canadian *Thanksgiving* is in October — we celebrate it earlier than our friends to the south because our harvest season wraps up sooner. 🍁',
+    '🍎 Canada grows over 100 varieties of apples. Ontario alone produces about half of the country\'s apple crop each fall.',
+    '🎃 Canada\'s most popular Halloween candy is Rockets (called Smarties in the US). We have strong opinions about candy. 🍬'
+  ],
+  11: [
+    '🌺 *Remembrance Day* is November 11. We wear poppies and honour those who served. Lest we forget. 🇨🇦',
+    '👨 *Movember* is here! Canada has a proud tradition of raising awareness for men\'s health. 🥸',
+    '🏳️‍⚧️ *Trans Awareness Week* runs Nov 13–19. Canada has protected gender identity under the Human Rights Act since 2017.',
+    '🍁 Canada has 10 provinces and 3 territories — each with its own distinct character and claim to being the best part of Canada.'
+  ],
+  12: [
+    '❄️ December in Canada: discovering exactly how many layers a person can wear. The answer is always one more. 🧤',
+    '🎄 Canada Post delivers mail to Santa at H0H 0H0, North Pole — and Santa writes back. Every year. 🎅',
+    '🕯️ The holiday season is celebrated many ways across Canada\'s diverse communities — Christmas, Hanukkah, Kwanzaa, and beyond. 🌟',
+    '🌨️ Canada holds the record for most snowfall in a single season at a weather station: 2,850 cm in Revelstoke, BC (1971–72).'
+  ]
+};
+
+// Canadian observances keyed by "month-weekOfMonth". Returns a string or null.
+var _CANADIAN_OBSERVANCES = {
+  '1-4':  '🔔 *Bell Let\'s Talk week* — Canada\'s largest corporate mental health initiative. Share, listen, and help end stigma. 💙',
+  '2-1':  '✊ *Black History Month* begins! Celebrating the achievements and resilience of Black Canadians all February long.',
+  '3-2':  '♀️ *International Women\'s Day* is this week (March 8) — celebrating the women who make CPB and Canada extraordinary.',
+  '4-3':  '🤝 *National Volunteer Week* — recognizing Canadians who give their time to make communities stronger.',
+  '4-4':  '🌍 *Earth Week* — Earth Day is April 22. A good week to appreciate Canada\'s incredible natural landscapes.',
+  '5-1':  '💚 *Mental Health Week* — the Canadian Mental Health Association\'s annual reminder to check in on yourself and each other.',
+  '6-3':  '🪶 *National Indigenous Peoples Day* is June 21 — honouring the living cultures of First Nations, Métis, and Inuit peoples.',
+  '10-1': '🧡 *Mental Illness Awareness Week* — it\'s okay not to be okay. Check in on your teammates this week.',
+  '11-2': '👨 *Movember* is underway — growing awareness (and moustaches) for men\'s health.',
+  '11-3': '🏳️‍⚧️ *Trans Awareness Week* (Nov 13–19) — Canada stands for inclusion and dignity for all.'
+};
+
+function _getWeeklyOpener(now, tz) {
+  var month  = parseInt(Utilities.formatDate(now, tz, 'M'), 10);
+  var day    = parseInt(Utilities.formatDate(now, tz, 'd'), 10);
+  var weekOM = Math.ceil(day / 7);
+  var key    = month + '-' + weekOM;
+
+  var body = _CANADIAN_OBSERVANCES[key] || (function() {
+    var facts   = _WEEKLY_FUN_FACTS[month] || _WEEKLY_FUN_FACTS[1];
+    var weekOfYr = Math.floor((now - new Date(now.getFullYear(), 0, 1)) / (7 * 86400000));
+    return facts[weekOfYr % facts.length];
+  })();
+
+  return 'Good morning, CPB! 👋\n\n' + body;
+}
+
 function sendWeeklyTeamNote() {
   var props = PropertiesService.getScriptProperties();
   var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
@@ -1291,7 +1396,7 @@ function sendWeeklyTeamNote() {
   }
 
   // Build message
-  var lines = ['Good morning, CPB! 👋', '', '📅 *Here\'s what\'s on the team calendar this week:*', ''];
+  var lines = [_getWeeklyOpener(now, tz), '', '📅 *Here\'s what\'s on the team calendar this week:*', ''];
 
   if (events.length === 0) {
     lines.push('Nothing scheduled this week — enjoy the open space! 🧘');
