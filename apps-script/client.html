@@ -2251,15 +2251,29 @@ function initRosterMap() {
   }
 })();
 
-// ─── TELUS Privacy Training countdown ────────────────────────────────────────
+// ─── Training countdown (dual-phase: SAT → Privacy) ──────────────────────────
 (function() {
-  // 2026-12-15 07:59:59 UTC = Dec 14 23:59:59 PST (UTC-8)
-  var DEADLINE = new Date('2026-12-15T07:59:59Z').getTime();
+  var PHASES = [
+    {
+      deadline: new Date('2026-11-25T07:59:59Z').getTime(), // Nov 24 23:59 PST
+      label:    'Security Awareness Training due in',
+      sub:      'Deadline: Monday, Nov 24 · 11:59 PM PST',
+      done:     'Security Awareness Training deadline has passed. Thanks for keeping TELUS secure! 🔒'
+    },
+    {
+      deadline: new Date('2026-12-15T07:59:59Z').getTime(), // Dec 14 23:59 PST
+      label:    'TELUS Privacy Training due in',
+      sub:      'Deadline: Monday, Dec 14 · 11:59 PM PST',
+      done:     'TELUS Privacy Training deadline has passed. Thanks for completing it! 🔒'
+    }
+  ];
   var el = {
-    days: document.getElementById('pcDays'),
-    hrs:  document.getElementById('pcHrs'),
-    mins: document.getElementById('pcMins'),
-    secs: document.getElementById('pcSecs'),
+    label:  document.querySelector('.pc-label'),
+    sub:    document.querySelector('.pc-sub'),
+    days:   document.getElementById('pcDays'),
+    hrs:    document.getElementById('pcHrs'),
+    mins:   document.getElementById('pcMins'),
+    secs:   document.getElementById('pcSecs'),
     digits: document.getElementById('pcDigits'),
     done:   document.getElementById('pcDone'),
     wrap:   document.getElementById('pcCountdown')
@@ -2269,13 +2283,23 @@ function initRosterMap() {
   function pad(n) { return n < 10 ? '0' + n : String(n); }
 
   function tick() {
-    var now  = Date.now();
-    var diff = DEADLINE - now;
+    var now = Date.now();
+    var phase = PHASES[PHASES.length - 1];
+    for (var i = 0; i < PHASES.length; i++) {
+      if (now < PHASES[i].deadline) { phase = PHASES[i]; break; }
+    }
+    el.label.textContent = phase.label;
+    el.sub.textContent   = phase.sub;
+    el.done.textContent  = phase.done;
+
+    var diff = phase.deadline - now;
     if (diff <= 0) {
       el.digits.hidden = true;
       el.done.hidden   = false;
       return;
     }
+    el.done.hidden   = true;
+    el.digits.hidden = false;
     var d = Math.floor(diff / 86400000);
     var h = Math.floor((diff % 86400000) / 3600000);
     var m = Math.floor((diff % 3600000)  / 60000);
@@ -2284,7 +2308,6 @@ function initRosterMap() {
     el.hrs.textContent  = pad(h);
     el.mins.textContent = pad(m);
     el.secs.textContent = pad(s);
-    // Turn lime when < 24 hours
     if (diff < 86400000) el.wrap.classList.add('pc-urgent');
     else el.wrap.classList.remove('pc-urgent');
   }
