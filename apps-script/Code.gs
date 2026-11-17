@@ -107,6 +107,16 @@ function getMeetingsManifest() {
   return MEETINGS;
 }
 
+// Run once to delete the orphaned sendDailyPulseCheckNudge trigger.
+function deleteOrphanedPulseCheckTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function(t) {
+    if (t.getHandlerFunction() === 'sendDailyPulseCheckNudge') {
+      ScriptApp.deleteTrigger(t);
+      Logger.log('Deleted orphaned trigger: sendDailyPulseCheckNudge');
+    }
+  });
+}
+
 // Run once from the Apps Script editor to schedule the Nov 25 access release.
 function createNovemberReleaseTrigger() {
   ScriptApp.newTrigger('releaseNovemberMeeting')
