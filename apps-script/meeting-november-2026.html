@@ -277,41 +277,6 @@
     .site-team { background: rgba(99,57,139,.4);  color: #c8a4e0; border: 1px solid rgba(99,57,139,.55); }
     .site-hub  { background: rgba(42,120,104,.35); color: #76d7c4; border: 1px solid rgba(42,120,104,.45); }
 
-    /* ── Notes floating button ────────────────────────── */
-    #notes-fab {
-      position: fixed; bottom: clamp(16px,2.5vw,32px); right: clamp(16px,2.5vw,32px); z-index: 70;
-      font-size: 13px; font-weight: 700; color: #fff;
-      background: var(--purple); border: 0; border-radius: 100px; padding: 13px 22px;
-      cursor: pointer; display: inline-flex; align-items: center; gap: 9px;
-      box-shadow: 0 10px 28px rgba(75,40,109,.3); font-family: var(--font);
-      transition: background .2s;
-    }
-    #notes-fab:hover { background: var(--purple-d); }
-
-    /* ── Notes modal ──────────────────────────────────── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: rgba(42,26,62,.55); align-items: center; justify-content: center; padding: var(--gut);
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: #fff; border-radius: 16px; padding: clamp(24px,4vw,36px);
-      max-width: 440px; width: 100%; box-shadow: 0 24px 64px rgba(42,26,62,.22);
-    }
-    .modal-title { font-weight: 750; font-size: 18px; letter-spacing: -.018em; color: var(--ink); margin: 0 0 18px; }
-    .modal-lbl { font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--grey-l); margin-bottom: 7px; display: block; }
-    .modal-select, .modal-ta {
-      width: 100%; padding: 10px 13px; background: var(--tint);
-      border: 1.5px solid var(--line-d); border-radius: 8px;
-      font-family: var(--font); font-size: 14px; color: var(--ink); outline: none;
-      transition: border-color .2s;
-    }
-    .modal-select { margin-bottom: 14px; cursor: pointer; }
-    .modal-ta { min-height: 100px; resize: vertical; line-height: 1.55; }
-    .modal-select:focus, .modal-ta:focus { border-color: var(--purple); background: #fff; }
-    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; align-items: center; }
-    .modal-status { font-size: 12px; color: var(--green); flex: 1; }
-
     /* ── Archive overlay ──────────────────────────────── */
     .arc-overlay {
       position: fixed; inset: 0; z-index: 300;
@@ -647,35 +612,6 @@
   </div>
 </section>
 
-<!-- ══ NOTES FAB ═════════════════════════════════════════ -->
-<button id="notes-fab" onclick="openNotes()">
-  <i class="fa-solid fa-pen-to-square"></i> Capture Note
-</button>
-
-<!-- ══ NOTES MODAL ══════════════════════════════════════ -->
-<div class="modal-overlay" id="notesOverlay" onclick="if(event.target===this)closeNotes()">
-  <div class="modal-box">
-    <h3 class="modal-title">
-      <i class="fa-solid fa-pen-to-square" style="color:var(--purple);margin-right:8px;font-size:16px;"></i>Capture a Note
-    </h3>
-    <label class="modal-lbl">Section</label>
-    <select class="modal-select" id="noteSection">
-      <option>Key Dates &amp; Budget Milestones</option>
-      <option>Angie's Presentation</option>
-      <option>Scavenger Hunt / Discussion</option>
-      <option>Action Item</option>
-      <option>General</option>
-    </select>
-    <label class="modal-lbl">Note</label>
-    <textarea class="modal-ta" id="noteText" placeholder="Type your note or action item…"></textarea>
-    <div class="modal-actions">
-      <span class="modal-status" id="noteStatus"></span>
-      <button class="btn-ghost" onclick="closeNotes()">Cancel</button>
-      <button class="btn-primary" id="noteSaveBtn" onclick="saveNote()">Save to Sheet</button>
-    </div>
-  </div>
-</div>
-
 <!-- ══ ARCHIVE OVERLAY ══════════════════════════════════ -->
 <div class="arc-overlay" id="arcOverlay">
   <div class="arc-panel">
@@ -697,30 +633,6 @@
     }, { threshold: 0.08 });
     document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
   })();
-
-  /* ── Notes ────────────────────────────────────── */
-  function openNotes(){ document.getElementById('notesOverlay').classList.add('open'); }
-  function closeNotes(){ document.getElementById('notesOverlay').classList.remove('open'); }
-  function saveNote(){
-    var section = document.getElementById('noteSection').value;
-    var text    = document.getElementById('noteText').value.trim();
-    if(!text) return;
-    var btn = document.getElementById('noteSaveBtn');
-    var status = document.getElementById('noteStatus');
-    btn.disabled = true; status.textContent = 'Saving…';
-    google.script.run
-      .withSuccessHandler(function(){
-        status.textContent = 'Saved!'; btn.disabled = false;
-        document.getElementById('noteText').value = '';
-        setTimeout(function(){ status.textContent=''; closeNotes(); }, 1600);
-      })
-      .withFailureHandler(function(err){
-        status.textContent = 'Error — ' + ((err&&err.message)||'try again');
-        status.style.color = '#B91C1C'; btn.disabled = false;
-        setTimeout(function(){ status.textContent=''; status.style.color=''; }, 4000);
-      })
-      .saveNoteToSheet(section, text);
-  }
 
   /* ── Archive ──────────────────────────────────── */
   var EXEC_URL = '<?!= execUrl ?>';
@@ -746,7 +658,7 @@
       .getMeetingsManifest();
   }
   function esc(s){ var d=document.createElement('div'); d.appendChild(document.createTextNode(String(s))); return d.innerHTML; }
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeArchive(); closeNotes(); } });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeArchive(); } });
 
 </script>
 </body>
