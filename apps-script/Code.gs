@@ -1226,8 +1226,10 @@ function sendDailySATNudge() {
     return;
   }
 
-  var dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-  var msg = _SAT_NUDGES[dayOfYear % _SAT_NUDGES.length] + ' ' + _satTimeRemaining(now);
+  var isDeadlineDay = (now.getMonth() === 10 && now.getDate() === 24); // Nov 24
+  var msg = isDeadlineDay
+    ? '🏆 That\'s a wrap on Security Awareness Training! Huge thanks to everyone on the CPB S&P team for getting it done. You\'re the reason TELUS stays secure. See you at the team meeting today! 🎉'
+    : _SAT_NUDGES[Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) % _SAT_NUDGES.length] + ' ' + _satTimeRemaining(now);
 
   try {
     var resp = UrlFetchApp.fetch(url, {
