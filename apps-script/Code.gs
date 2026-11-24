@@ -999,6 +999,9 @@ function scheduleMonthlyBRNotification() {
 }
 
 function preRunBRReminder() {
+  var _day = new Date().getDay();
+  if (_day === 0 || _day === 6) return; // skip weekends
+
   var cfg    = _brQueriesConfig(SpreadsheetApp.openById(BR_QUERIES_SHEET_ID).getSheetByName('CONFIG'));
   var month  = _brQueriesFormatPeriod(cfg['Current Period']);
   var pwnUrl = PropertiesService.getScriptProperties().getProperty('PWN_SHEET_URL') ||
@@ -1018,6 +1021,9 @@ function preRunBRReminder() {
 }
 
 function _brQueriesPostRunCheck() {
+  var _day = new Date().getDay();
+  if (_day === 0 || _day === 6) return; // skip weekends
+
   var cfg    = _brQueriesConfig(SpreadsheetApp.openById(BR_QUERIES_SHEET_ID).getSheetByName('CONFIG'));
   var exp    = cfg['Current Period'];
   var month  = _brQueriesFormatPeriod(exp);
@@ -1213,6 +1219,9 @@ function _satTimeRemaining(now) {
 }
 
 function sendDailySATNudge() {
+  var _day = new Date().getDay();
+  if (_day === 0 || _day === 6) return; // skip weekends
+
   var now = new Date();
   if (now >= _SAT_DEADLINE_UTC) {
     Logger.log('sendDailySATNudge: past deadline — skipping.');
@@ -1287,6 +1296,9 @@ function _ordinal(n) {
 }
 
 function sendAnniversaryNudges() {
+  var _day = new Date().getDay();
+  if (_day === 0 || _day === 6) return; // skip weekends
+
   var props = PropertiesService.getScriptProperties();
   var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
   if (!url) {
@@ -1482,6 +1494,9 @@ function _getWeeklyOpener(now, tz) {
 }
 
 function sendWeeklyTeamNote() {
+  var _day = new Date().getDay();
+  if (_day === 0 || _day === 6) return; // skip weekends
+
   var props = PropertiesService.getScriptProperties();
   var url   = props.getProperty('CHAT_WEBHOOK_URL_PLANNY');
   if (!url) {
