@@ -68,7 +68,7 @@ var MEETINGS = [
   {
     id: 'november-2026',
     title: 'November Team Meeting',
-    date: 'November 24, 2026',
+    date: 'November 26, 2026',
     description: 'Toronto meeting: land acknowledgement, Angie\'s presentation, key dates & budget milestones, and a cross-site scavenger hunt.',
     file: 'meeting-november-2026'
   },
@@ -121,7 +121,7 @@ function deleteOrphanedPulseCheckTrigger() {
 function createNovemberReleaseTrigger() {
   ScriptApp.newTrigger('releaseNovemberMeeting')
     .timeBased()
-    .at(new Date(2026, 10, 25, 0, 5)) // Nov 25, 2026 at 00:05 script timezone
+    .at(new Date(2026, 10, 27, 0, 5)) // Nov 27, 2026 at 00:05 script timezone
     .create();
   Logger.log('Trigger created: releaseNovemberMeeting will fire Nov 25 2026 at 00:05');
 }
@@ -1228,7 +1228,7 @@ function sendDailySATNudge() {
 
   var isDeadlineDay = (now.getMonth() === 10 && now.getDate() === 24); // Nov 24
   var msg = isDeadlineDay
-    ? '🏆 That\'s a wrap on Security Awareness Training! Huge thanks to everyone on the CPB S&P team for getting it done. You\'re the reason TELUS stays secure. See you at the team meeting today! 🎉'
+    ? '🏆 That\'s a wrap on Security Awareness Training! Huge thanks to everyone on the CPB S&P team for getting it done. You\'re the reason TELUS stays secure. See you at the team meeting on Wednesday! 🎉'
     : _SAT_NUDGES[Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000) % _SAT_NUDGES.length] + ' ' + _satTimeRemaining(now);
 
   try {

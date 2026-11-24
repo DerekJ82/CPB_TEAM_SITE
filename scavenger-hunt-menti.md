@@ -1,5 +1,5 @@
 # CPB S&P Virtual Scavenger Hunt — Mentimeter Question Bank
-## November 24, 2026 Team Meeting · Toronto · Hosted by Derek
+## November 26, 2026 Team Meeting · Toronto · Hosted by Derek
 
 ---
 
